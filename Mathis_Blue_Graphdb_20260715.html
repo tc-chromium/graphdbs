@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Miles Mathis Charge Field — Atomic & Molecular MBN Dynamics</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{overflow:hidden;background:#030308;color:#ccc;font-family:'Segoe UI',Arial,sans-serif}
+#top-formula{position:absolute;top:20px;left:50%;transform:translateX(-50%);z-index:20;color:#cc9900;font-size:42px;font-weight:900;letter-spacing:3px;text-shadow:0 0 20px rgba(0,200,255,0.8),0 0 40px rgba(0,200,255,0.4);pointer-events:none;transition:all .3s ease;white-space:nowrap}
+#ui{position:absolute;top:10px;left:10px;background:rgba(5,5,20,0.93);padding:12px;border-radius:8px;width:272px;z-index:10;max-height:96vh;overflow-y:auto;border:1px solid rgba(0,170,255,0.25);scrollbar-width:thin;scrollbar-color:#0af #111}
+#ui::-webkit-scrollbar{width:5px}#ui::-webkit-scrollbar-thumb{background:#0af;border-radius:3px}
+#ui h3{color:#0af;font-size:13px;margin:6px 0;border-bottom:1px solid rgba(0,170,255,0.2);padding-bottom:4px}
+.grid{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;margin-bottom:8px}
+.el-btn{background:rgba(0,30,60,0.7);color:#0af;border:1px solid rgba(0,170,255,0.35);padding:3px 1px;font-size:9px;cursor:pointer;border-radius:3px;text-align:center;transition:all .15s;line-height:1.2}
+.el-btn:hover{background:#0af;color:#000;transform:scale(1.08)}
+.el-btn.active{background:#0af;color:#000;font-weight:bold}
+#mol-panel{position:absolute;top:10px;right:10px;background:rgba(5,5,20,0.93);padding:12px;border-radius:8px;width:330px;z-index:10;border:1px solid rgba(0,255,136,0.25);max-height:96vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#0f8 #111}
+#mol-panel::-webkit-scrollbar{width:5px}#mol-panel::-webkit-scrollbar-thumb{background:#0f8;border-radius:3px}
+#mol-panel h3{color:#0f8;font-size:13px;margin:6px 0;border-bottom:1px solid rgba(0,255,136,0.2);padding-bottom:4px}
+#info-panel{position:absolute;bottom:10px;left:10px;background:rgba(5,5,20,0.93);padding:12px;border-radius:8px;width:380px;z-index:10;border:1px solid rgba(255,170,0,0.25);font-size:11px;line-height:1.55;max-height:42vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#fa0 #111}
+#info-panel h3{color:#fa0;font-size:13px;margin-bottom:6px}
+.detail-toggle-btn{display:inline-block;margin:6px 0 0 0;padding:5px 9px;font-size:10px;background:linear-gradient(135deg,#ffaa00,#ff6600);color:#000;border-radius:999px;border:none;cursor:pointer}
+.detail-hidden-note{margin-top:8px;padding:8px;border-radius:6px;background:rgba(255,170,0,0.12);border:1px solid rgba(255,170,0,0.22);color:#ffd27a;font-size:10px}
+#controls{position:absolute;bottom:10px;left:400px;background:rgba(5,5,20,0.93);padding:12px;border-radius:8px;width:240px;z-index:10;border:1px solid rgba(255,80,80,0.25);font-size:11px;max-height:42vh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#f66 #111}
+#controls h3{color:#f66;font-size:13px;margin-bottom:6px}
+input[type=text],select{width:100%;padding:6px 8px;margin:4px 0;font-size:12px;background:rgba(0,20,40,0.8);color:#0af;border:1px solid rgba(0,170,255,0.35);border-radius:4px}
+button{padding:7px 10px;margin:4px 0;font-size:12px;background:linear-gradient(135deg,#0af,#0f8);color:#000;border:none;border-radius:4px;cursor:pointer;font-weight:bold;transition:opacity .15s}
+button:hover{opacity:.8}
+.ctrl-row{display:flex;align-items:center;gap:6px;margin:5px 0;font-size:11px}
+.ctrl-row label{flex:1;color:#aaa}
+.ctrl-row input[type=range]{flex:1.5;accent-color:#0af;height:4px}
+.ctrl-row input[type=checkbox]{width:auto;accent-color:#0af}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:8px;font-size:10px}
+.legend div{padding:2px 5px;border-radius:3px}
+.slot-map{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:6px;font-size:9px;text-align:center}
+.slot-map div{padding:2px;border-radius:2px;background:rgba(0,40,80,0.5)}
+.slot-map div.filled{background:rgba(0,170,255,0.3);color:#0af;font-weight:bold}
+.mol-presets{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+.mol-presets button{width:auto;padding:4px 10px;font-size:11px;margin:0}
+.mbn-box{margin-top:10px;font-size:10px;color:#aaa;border-top:1px solid #333;padding-top:8px}
+.mbn-code{background:#111;padding:4px;border-radius:3px;margin:4px 0;color:#0f8;font-family:monospace;display:inline-block}
+.mbn-btn{padding:2px 6px;font-size:10px;margin-left:5px;vertical-align:middle}
+.mbn-checker{margin-top:10px;border-top:1px solid rgba(0,255,136,0.3);padding-top:10px}
+.score-bar{height:22px;background:#111;border-radius:11px;overflow:hidden;margin:6px 0;border:1px solid #333}
+.score-fill{height:100%;border-radius:11px;transition:width .6s;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:bold;color:#000}
+.score-fill.high{background:linear-gradient(90deg,#0f8,#0af)}.score-fill.mid{background:linear-gradient(90deg,#fa0,#ff0)}.score-fill.low{background:linear-gradient(90deg,#f44,#f80)}
+.bond-list{margin-top:8px;font-size:10px}
+.bond-entry{padding:5px 7px;margin:3px 0;border-radius:5px;display:flex;align-items:center;gap:6px;border-left:3px solid transparent}
+.bond-entry.valid{background:rgba(0,255,136,0.08);border-left-color:#0f8}
+.bond-entry.weak{background:rgba(255,170,0,0.08);border-left-color:#fa0}
+.bond-entry.invalid{background:rgba(255,68,68,0.08);border-left-color:#f44}
+.bond-entry.slip{background:rgba(0,170,255,0.08);border-left-color:#0af}
+.bond-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.bond-dot.valid{background:#0f8}.bond-dot.weak{background:#fa0}.bond-dot.invalid{background:#f44}.bond-dot.slip{background:#0af}
+.bond-mbn{font-family:monospace;color:#ccc;flex:1;font-size:10px}
+.bond-strength{font-size:9px;color:#888;text-align:right;min-width:52px;line-height:1.2}
+.compat-matrix{margin-top:8px;font-size:9px}
+.compat-matrix table{width:100%;border-collapse:collapse}
+.compat-matrix th,.compat-matrix td{padding:3px 2px;text-align:center;border:1px solid #222}
+.compat-matrix th{background:rgba(0,170,255,0.1);color:#0af}
+.compat-cell{font-weight:bold;font-size:10px}
+.compat-cell.high{color:#0f8}.compat-cell.mid{color:#fa0}.compat-cell.low{color:#f44}.compat-cell.none{color:#333}
+.warning-list{margin-top:8px;font-size:10px}
+.warning-item{padding:4px 7px;margin:3px 0;border-radius:4px;background:rgba(255,68,68,0.1);border-left:3px solid #f44;color:#f88}
+.suggestion-item{padding:4px 7px;margin:3px 0;border-radius:4px;background:rgba(0,170,255,0.1);border-left:3px solid #0af;color:#8df}
+.checker-btns{display:flex;gap:4px;margin:8px 0;flex-wrap:wrap}
+.checker-btns button{flex:1;min-width:80px;padding:6px 4px;font-size:11px}
+.checker-btns button.btn-validate{background:linear-gradient(135deg,#fa0,#f80)}
+.checker-btns button.btn-autofix{background:linear-gradient(135deg,#0af,#08f)}
+.checker-btns button.btn-reset{background:linear-gradient(135deg,#f44,#a22)}
+#layout-score-label{font-size:12px;color:#0f8;font-weight:bold;text-align:center;margin:4px 0}
+.atom-popup-overlay{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:200}
+.atom-popup{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:201;background:rgba(8,8,25,0.98);border:1px solid rgba(0,170,255,0.5);border-radius:14px;width:400px;max-height:85vh;overflow-y:auto;box-shadow:0 0 40px rgba(0,170,255,0.25);scrollbar-width:thin;scrollbar-color:#0af #111}
+.atom-popup::-webkit-scrollbar{width:5px}.atom-popup::-webkit-scrollbar-thumb{background:#0af;border-radius:3px}
+.popup-header{display:flex;align-items:center;padding:16px 20px 12px;border-bottom:1px solid rgba(0,170,255,0.2)}
+.popup-symbol-box{width:72px;height:72px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-right:16px;border:2px solid rgba(0,170,255,0.4);position:relative}
+.popup-symbol-box .z-num{position:absolute;top:3px;left:6px;font-size:10px;color:#aaa}
+.popup-symbol-box .sym{font-size:32px;font-weight:900;color:#0af;line-height:1}
+.popup-symbol-box .w-num{position:absolute;bottom:3px;right:6px;font-size:9px;color:#888}
+.popup-title{flex:1}.popup-title .name{font-size:20px;font-weight:700;color:#fff}.popup-title .cat{font-size:11px;color:#0f8;margin-top:2px}
+.popup-close{background:none;border:none;color:#888;font-size:22px;cursor:pointer;padding:0 4px}.popup-close:hover{color:#fff}
+.popup-body{padding:14px 20px 20px}
+.popup-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.popup-field{background:rgba(0,30,60,0.5);border-radius:6px;padding:8px 10px}
+.popup-field .pf-label{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:0.5px}
+.popup-field .pf-value{font-size:13px;color:#0af;font-weight:600;margin-top:2px}
+.popup-section{margin-top:12px}.popup-section h4{color:#fa0;font-size:12px;margin-bottom:6px;border-bottom:1px solid rgba(255,170,0,0.2);padding-bottom:3px}
+.popup-dir-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.popup-dir-cell{background:rgba(0,20,40,0.6);border-radius:5px;padding:5px;text-align:center;font-size:10px}
+.popup-dir-cell .dir-name{font-weight:700;color:#fff;font-size:11px}
+.popup-dir-cell .dir-spin{margin-top:2px}.popup-dir-cell .dir-spin.cw{color:#ffdd00}.popup-dir-cell .dir-spin.ccw{color:#00ddff}
+.popup-dir-cell .dir-hook{font-size:9px;color:#888;margin-top:1px}
+.eq-section{margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,170,0,0.15);font-size:10px}
+.eq-row{display:flex;justify-content:space-between;padding:2px 0;color:#aaa}
+.eq-row .eq-val{color:#0af;font-family:monospace}
+.panel-header{display:flex;align-items:center;justify-content:space-between;gap:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:6px}
+.panel-title{font-size:12px;font-weight:bold;flex:1;letter-spacing:0.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ui .panel-title{color:#0af}#mol-panel .panel-title{color:#0f8}#info-panel .panel-title{color:#fa0}#controls .panel-title{color:#f66}
+.panel-toggle{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);color:#fff;width:24px;height:24px;font-size:17px;font-weight:bold;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;line-height:1;transition:all .15s;font-family:monospace}
+.panel-toggle:hover{background:rgba(255,255,255,0.18);transform:scale(1.12)}
+.panel-body{overflow:hidden}
+.collapsible-panel{transition:width .25s ease,padding .25s ease}
+.collapsible-panel.collapsed{width:38px!important;min-width:38px!important;max-width:38px!important;padding:6px 3px!important;max-height:none!important;overflow:visible!important}
+.collapsible-panel.collapsed .panel-header{border-bottom:none;padding-bottom:0;margin-bottom:0;flex-direction:column;gap:3px}
+.collapsible-panel.collapsed .panel-title{display:none}
+.collapsible-panel.collapsed .panel-body{display:none}
+.collapsible-panel.collapsed .panel-toggle{width:30px;height:30px;font-size:22px}
+.collapsible-panel.collapsed .sec-toggle-icon{display:none}
+#ui.collapsed{border-color:rgba(0,170,255,0.7)!important}#mol-panel.collapsed{border-color:rgba(0,255,136,0.7)!important}#info-panel.collapsed{border-color:rgba(255,170,0,0.7)!important}#controls.collapsed{border-color:rgba(255,80,80,0.7)!important}
+#ui.collapsed .panel-toggle{color:#0af;border-color:rgba(0,170,255,0.5)}#mol-panel.collapsed .panel-toggle{color:#0f8;border-color:rgba(0,255,136,0.5)}#info-panel.collapsed .panel-toggle{color:#fa0;border-color:rgba(255,170,0,0.5)}#controls.collapsed .panel-toggle{color:#f66;border-color:rgba(255,80,80,0.5)}
+.section-toggle{display:flex;align-items:center;cursor:pointer;user-select:none}
+.section-toggle:hover{opacity:.85}
+.section-toggle h3{flex:1;cursor:pointer;margin-right:6px!important}
+.sec-toggle-icon{color:rgba(255,255,255,0.5);font-size:14px;font-weight:bold;width:18px;height:18px;display:flex;align-items:center;justify-content:center;border-radius:3px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);flex-shrink:0;transition:all .15s;font-family:monospace}
+.section-toggle:hover .sec-toggle-icon{background:rgba(255,255,255,0.1);color:#fff}
+.section-content{overflow:hidden}
+.section-content.sec-collapsed{display:none}
+#hide-all-btn{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:100;padding:9px 20px;background:linear-gradient(135deg,rgba(255,68,68,0.92),rgba(170,34,34,0.92));color:#fff;border:1px solid rgba(255,68,68,0.4);border-radius:8px;cursor:pointer;font-weight:bold;font-size:11px;box-shadow:0 2px 14px rgba(0,0,0,0.6);transition:all .2s;letter-spacing:0.5px;font-family:inherit;backdrop-filter:blur(4px)}
+#hide-all-btn:hover{transform:translateX(-50%) scale(1.06);box-shadow:0 4px 18px rgba(0,0,0,0.7)}
+#hide-all-btn.all-hidden{background:linear-gradient(135deg,rgba(0,255,136,0.92),rgba(0,170,255,0.92));border-color:rgba(0,255,136,0.4)}
+@media(max-width:900px){#hide-all-btn{bottom:8px;padding:7px 14px;font-size:10px}#controls{left:10px;right:10px;width:auto!important;bottom:auto;top:auto}#info-panel{width:auto!important;left:10px;right:10px}#ui{width:240px}#mol-panel{width:280px}}
+</style>
+</head>
+<body>
+<div id="top-formula"> </div>
+<div id="ui" class="collapsible-panel">
+<div class="panel-header"><span class="panel-title">Elements &amp; Slots</span><button class="panel-toggle" onclick="togglePanel('ui')" title="Collapse panel">−</button></div>
+<div class="panel-body">
+<div class="section-toggle" onclick="toggleSection(this)"><h3>Mathis 19-Slot Periodic Table (1-98)</h3><span class="sec-toggle-icon">−</span></div>
+<div class="section-content"><div class="grid" id="pt-grid"></div></div>
+<div class="section-toggle" onclick="toggleSection(this)"><h3>Slot Map</h3><span class="sec-toggle-icon">−</span></div>
+<div class="section-content"><div class="slot-map" id="slot-map"></div></div>
+<div class="section-toggle" onclick="toggleSection(this)"><h3>Atomic Legend</h3><span class="sec-toggle-icon">−</span></div>
+<div class="section-content">
+<div class="legend">
+<div style="background:#f00202;color:#fff">Proton</div><div style="background:#02f002;color:#000">Neutron</div>
+<div style="background:#f0f002;color:#000">Electron</div><div style="background:rgba(50,50,50,.8);color:#fff">L0 Disc</div>
+<div style="background:rgba(160,160,160,.5);color:#000">L1 Disc</div><div style="background:rgba(15,15,244,.5);color:#fff">L2 Disc</div>
+<div style="background:rgba(255,0,255,.3);color:#fff">L3 Disc</div><div style="background:rgba(240,29,23,.5);color:#fff">L4 Disc</div>
+<div style="background:rgba(15,240,15,.5);color:#000">L5 Hook</div><div style="background:rgba(0,255,255,.3);color:#000">L6 Disc</div>
+<div style="background:#ffdd00;color:#000">CW Spin</div><div style="background:#00ddff;color:#000">CCW Spin</div>
+</div></div></div></div>
+
+<div id="mol-panel" class="collapsible-panel">
+<div class="panel-header"><span class="panel-title">Molecule Builder</span><button class="panel-toggle" onclick="togglePanel('mol-panel')" title="Collapse panel">−</button></div>
+<div class="panel-body">
+<div class="section-toggle" onclick="toggleSection(this)"><h3>Molecule Builder (Formula)</h3><span class="sec-toggle-icon">−</span></div>
+<div class="section-content">
+    <input type="text" id="mol-input" value="NaCl" placeholder="Formula (e.g. NaCl)">
+    <input type="text" id="mol-search" placeholder="Search molecules... (fuzzy)" style="width:100%;padding:8px;margin:6px 0 8px 0;font-size:13px;background:rgba(0,20,40,0.9);border:1px solid #0af;border-radius:4px;">
+    <div id="mol-results" style="max-height:280px;overflow-y:auto;background:rgba(5,5,25,0.98);border:1px solid #0af;border-radius:4px;display:none;box-shadow:0 4px 12px rgba(0,170,255,0.3);"></div>
+    <div class="mol-presets" style="margin:8px 0 10px 0;display:flex;flex-wrap:wrap;gap:4px;">
+        <button onclick="quickLoad('H2O')">H₂O</button><button onclick="quickLoad('NaCl')">NaCl</button><button onclick="quickLoad('SF6')">SF6</button>
+        <button onclick="quickLoad('CO2')">CO₂</button><button onclick="quickLoad('CH4')">CH₄</button><button onclick="quickLoad('NH3')">NH₃</button>
+    </div>
+    <button onclick="buildMolecule()" style="width:100%;margin-bottom:8px;">Build Molecule</button>
+
+
+    <!-- NEW: Export to Cypher Button and Textarea -->
+    <button onclick="exportToCypher()" style="width:100%;margin-bottom:8px;background:linear-gradient(135deg,#fa0,#f80);color:#000;">Export to Cypher</button>
+    <div id="cypher-output" style="display:none;margin-top:8px;">
+        <textarea id="cypher-text" style="width:100%;height:180px;font-size:10px;font-family:monospace;background:#111;color:#0f8;border:1px solid #333;border-radius:4px;padding:5px;" readonly></textarea>
+        <button onclick="copyCypher()" style="width:100%;margin-top:4px;background:linear-gradient(135deg,#0af,#08f);">Copy to Clipboard</button>
+    </div>
+    <div id="mol-info" style="margin-top:8px;font-size:11px;line-height:1.5"></div>
+
+</div>
+
+<div class="mbn-checker">
+<div class="section-toggle" onclick="toggleSection(this)"><h3 style="color:#ff0;border-bottom-color:rgba(255,255,0,.2)">MBN Layout Checker</h3><span class="sec-toggle-icon">−</span></div>
+<div class="section-content">
+<div id="layout-score-label">No molecule loaded</div><div class="score-bar"><div class="score-fill" id="score-fill" style="width:0%"></div></div>
+<div class="checker-btns"><button class="btn-validate" onclick="validateLayout()">Validate</button><button class="btn-autofix" onclick="autoAlignMolecule()">Auto-Align</button><button class="btn-reset" onclick="resetLayout()">Reset</button></div>
+<div id="bond-list" class="bond-list"></div><div id="warning-list" class="warning-list"></div><div id="compat-matrix" class="compat-matrix"></div>
+</div></div>
+
+<div class="section-toggle" onclick="toggleSection(this)"><h3 style="color:#ff44ff; border-bottom-color: rgba(255,68,255,.2);">Mathis Charge-NMR Analysis</h3><span class="sec-toggle-icon">−</span></div>
+<div class="section-content">
+    <p style="font-size:10px; color:#aaa; margin-bottom:6px;">NMR activity requires CW North Spin (+). Splitting caused by adjacent active atoms via charge channels.</p>
+    <button onclick="runNMR()" style="width:100%; margin-bottom:8px; background:linear-gradient(135deg, #f4f, #80f);">Run Charge-NMR</button>
+    <canvas id="nmr-canvas" width="600" height="200" style="width:100%; height:150px; border:1px solid rgba(255,68,255,0.3); border-radius:4px; background:#050510;"></canvas>
+    <div id="nmr-peaks" style="margin-top:8px; font-size:10px; max-height:180px; overflow-y:auto;"></div>
+</div>
+
+<div class="section-toggle" onclick="toggleSection(this)"><h3>MBN Step-by-Step Builder</h3><span class="sec-toggle-icon">−</span></div>
+<div class="section-content">
+<label style="font-size:10px;color:#aaa">Base Atom:</label><select id="mbn-base-atom" style="width:100%;margin-bottom:5px"></select>
+<label style="font-size:10px;color:#aaa">Target Atom:</label><select id="mbn-target-atom" style="width:100%;margin-bottom:5px"></select>
+<button onclick="checkMBNConnections()" style="width:100%">Calculate MBN Bonds</button>
+<div id="mbn-results" style="margin-top:8px;font-size:11px;line-height:1.8"></div>
+</div>
+<div class="section-toggle" onclick="toggleSection(this)"><h3>MBN Reference</h3><span class="sec-toggle-icon">−</span></div>
+<div class="section-content"><div class="mbn-box">
+<strong style="color:#0f8">Mathis Bond Notation (MBN)</strong><br>
+<div class="mbn-code">A =[N:1/+]>[S:2/-] B</div><br>
+<strong style="color:#fa0">Bonding Rules:</strong><br>
+1. <b>Through-Charge (N>S):</b> N-Emission connects to S-Intake. Strongest bond (100%). Forms straight pillars.<br>
+2. <b>Polar Repulsion:</b> N>N or S>S is strictly 0% (charge collision).<br>
+3. <b>Carousel Interlock (E/W/F/B):</b> Requires opposite spins (+/-) to mechanically interlock without crashing. Max 65%.<br>
+Spin: + (CW/Odd) | - (CCW/Even)<br>
+Hook: OUT (Emit) | IN (Intake/Seal)<br>
+<br><b style="color:#0af">Reference:</b><br><a href="https://milesmathis.forumotion.com/t895-claude-tackles-the-atomic-structure-question-for-phase-2-abridged-chat-log" target="_blank" style="color:#0af; text-decoration:underline;">Phase 2 Atomic Structure (Abridged Chat Log)</a>
+</div></div>
+</div></div>
+
+<div id="info-panel" class="collapsible-panel">
+<div class="panel-header"><span class="panel-title">Charge Details</span><button class="panel-toggle" onclick="togglePanel('info-panel')" title="Collapse panel">−</button></div>
+<div class="panel-body"><div id="info-content">Select an element.</div></div></div>
+
+<div id="controls" class="collapsible-panel">
+<div class="panel-header"><span class="panel-title">Controls</span><button class="panel-toggle" onclick="togglePanel('controls')" title="Collapse panel">−</button></div>
+<div class="panel-body">
+<div class="ctrl-row"><label>Flow Speed</label><input type="range" id="ctrl-speed" min="0" max="3" step="0.1" value="1"></div>
+<div class="ctrl-row"><label>Through-Charge</label><input type="checkbox" id="ctrl-through" checked></div>
+<div class="ctrl-row"><label>South Intake</label><input type="checkbox" id="ctrl-intake" checked></div>
+<div class="ctrl-row"><label>North Emission</label><input type="checkbox" id="ctrl-emission" checked></div>
+<div class="ctrl-row"><label>Equatorial Emit</label><input type="checkbox" id="ctrl-equatorial" checked></div>
+<div class="ctrl-row"><label>Bond Channels</label><input type="checkbox" id="ctrl-bonds" checked></div>
+<div class="ctrl-row"><label>Slot Labels</label><input type="checkbox" id="ctrl-labels" checked></div>
+<div class="ctrl-row"><label>Charge Discs</label><input type="checkbox" id="ctrl-discs" checked></div>
+<div class="ctrl-row"><label>Spin Arrows</label><input type="checkbox" id="ctrl-spin" checked></div>
+<div class="ctrl-row"><label>Carousel Spin</label><input type="checkbox" id="ctrl-carousel"></div>
+<div class="ctrl-row"><label>Pressure Zones</label><input type="checkbox" id="ctrl-pressure" checked></div>
+<div class="ctrl-row"><label>MBN Tags</label><input type="checkbox" id="ctrl-mbntags" checked></div>
+</div></div>
+
+<button id="hide-all-btn" onclick="toggleAllPanels()">[Hide All]</button>
+
+<div class="atom-popup-overlay" id="popup-overlay" onclick="closeAtomPopup()"></div>
+<div class="atom-popup" id="atom-popup">
+<div class="popup-header"><div class="popup-symbol-box" id="popup-sym-box"><span class="z-num" id="popup-z"></span><span class="sym" id="popup-sym"></span><span class="w-num" id="popup-weight"></span></div><div class="popup-title"><div class="name" id="popup-name"></div><div class="cat" id="popup-cat"></div></div><button class="popup-close" onclick="closeAtomPopup()">&times;</button></div>
+<div class="popup-body" id="popup-body"></div></div>
+<div id="canvas-container" style="position:absolute;top:0;left:0;width:100vw;height:100vh;z-index:0"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+var allPanelIds = ['ui', 'mol-panel', 'info-panel', 'controls'];
+function togglePanel(id) { var panel = document.getElementById(id); if (!panel) return; var isCollapsed = panel.classList.contains('collapsed'); var btn = panel.querySelector('.panel-toggle'); if (isCollapsed) { panel.classList.remove('collapsed'); if (btn) { btn.textContent = '\u2212'; btn.title = 'Collapse panel'; } } else { panel.classList.add('collapsed'); if (btn) { btn.textContent = '+'; btn.title = 'Expand panel'; } } updateHideAllBtn(); }
+function toggleSection(el) { var content = el.nextElementSibling; var icon = el.querySelector('.sec-toggle-icon'); if (!content) return; if (content.classList.contains('sec-collapsed')) { content.classList.remove('sec-collapsed'); if (icon) icon.textContent = '\u2212'; } else { content.classList.add('sec-collapsed'); if (icon) icon.textContent = '+'; } }
+function toggleAllPanels() { var allCollapsed = allPanelIds.every(function(id) { var p = document.getElementById(id); return p && p.classList.contains('collapsed'); }); allPanelIds.forEach(function(id) { var panel = document.getElementById(id); if (!panel) return; var btn = panel.querySelector('.panel-toggle'); if (allCollapsed) { panel.classList.remove('collapsed'); if (btn) { btn.textContent = '\u2212'; btn.title = 'Collapse panel'; } } else { panel.classList.add('collapsed'); if (btn) { btn.textContent = '+'; btn.title = 'Expand panel'; } } }); updateHideAllBtn(); }
+function updateHideAllBtn() { var btn = document.getElementById('hide-all-btn'); if (!btn) return; var allCollapsed = allPanelIds.every(function(id) { var p = document.getElementById(id); return p && p.classList.contains('collapsed'); }); if (allCollapsed) { btn.textContent = 'Show All'; btn.classList.add('all-hidden'); } else { btn.textContent = 'Hide All'; btn.classList.remove('all-hidden'); } }
+
+var MathisQ = {
+    SOURCE_URL: "https://milesmathis.forumotion.com/t895-claude-tackles-the-atomic-structure-question-for-phase-2-abridged-chat-log",
+    SPIN_CW: 1.0, SPIN_CCW: 0.5, CAP_BLOCK: 0.0, HOOK_OUT: 1.0, HOOK_IN: 0.3, HOOK_NONE: 0.0, ATTEN: 0.05, ETA_RECYCLE: 0.65, ETA_THROUGH: 0.80, KAPPA_EQ: 0.20, MAX_SLOT: 6, CAP_EM: 0.20, CAP_IN: 0.20, CAR_INTAKE_EVEN: 0.10, CAR_R: 6.0, PROT_R: 1.0, PILLAR_SC: 1.1,
+    spinFactor: function(n) { return n % 2 === 1 ? this.SPIN_CW : this.SPIN_CCW; }, 
+    hookFactor: function(h) { return h === 'OUT' ? this.HOOK_OUT : h === 'IN' ? this.HOOK_IN : this.HOOK_NONE; }, 
+    capFactor: function(sealed) { return sealed ? this.CAP_BLOCK : 1.0; },
+    carouselEmission: function(arr, spinDir, hookState) { var n = arr.length; if (!n) return 0; return Math.min(1, (n / this.MAX_SLOT) * (spinDir === '+' ? this.SPIN_CW : this.SPIN_CCW) * this.hookFactor(hookState)); },
+    equatorialNet: function(slots, dirs) { return this.carouselEmission(slots.ce, dirs.E.spin, dirs.E.hook) + this.carouselEmission(slots.cw, dirs.W.spin, dirs.W.hook) + this.carouselEmission(slots.cf, dirs.F.spin, dirs.F.hook) + this.carouselEmission(slots.cb, dirs.B.spin, dirs.B.hook); },
+    chargeRecycling: function(slots) { var sum = 0, cars = [slots.ce, slots.cw, slots.cf, slots.cb]; for (var i = 0; i < 4; i++) { var n = cars[i].length; if (n > 0 && n % 2 === 0) sum += n * this.CAR_INTAKE_EVEN; } return Math.min(1, sum * this.ETA_RECYCLE); },
+    northEmission: function(slots, dirs) { var fSpin = this.spinFactor(slots.pn.length), fCap = this.capFactor(dirs.N.capSeal); return Math.min(1, (slots.pn.length / this.MAX_SLOT) * fSpin * fCap + slots.capN.length * this.CAP_EM + this.KAPPA_EQ * this.equatorialNet(slots, dirs)); },
+    southIntake: function(slots, dirs) { var fSpin = this.spinFactor(slots.ps.length), fCap = this.capFactor(dirs.S.capSeal); return Math.min(1, (slots.ps.length / this.MAX_SLOT) * fSpin * fCap + slots.capS.length * this.CAP_IN + this.ETA_RECYCLE * this.chargeRecycling(slots) * 0.3); },
+    throughCharge: function(slots, dirs) { return this.southIntake(slots, dirs) * this.ETA_THROUGH; },
+    effectiveRadius: function(slots) { var coreR = this.PROT_R * Math.pow(Math.max(1, slots.core.length), 1/3) * this.PILLAR_SC; var maxCar = Math.max.apply(null, [0, slots.ce.length, slots.cw.length, slots.cf.length, slots.cb.length]); return coreR + (maxCar > 0 ? this.PROT_R * maxCar * 0.5 + this.CAR_R : 0); },
+    carouselAngVel: function(slots, dirs) { var pT = this.throughCharge(slots, dirs), tC = slots.ce.length + slots.cw.length + slots.cf.length + slots.cb.length; return tC ? pT / Math.max(1, tC * this.CAR_R * this.CAR_R) * 50 : 0; },
+    equatorialPressure: function(arr, spinDir, hookState, phiThrough) { return this.carouselEmission(arr, spinDir, hookState) * (1 + phiThrough) / Math.max(1, arr.length * 2); },
+    
+    calculateIE1: function(slots, dirs, occupiedDirs) {
+        var recyc = this.chargeRecycling(slots);
+        var eqNet = this.equatorialNet(slots, dirs);
+        var thruCh = this.throughCharge(slots, dirs);
+        var nEm = this.northEmission(slots, dirs);
+        var effR = this.effectiveRadius(slots);
+        if (occupiedDirs) {
+            if (occupiedDirs.has('N')) nEm *= 0.4;
+            if (occupiedDirs.has('S')) thruCh *= 0.4;
+        }
+        var ie1 = (recyc * 250 + eqNet * 80) - (thruCh * 100 + nEm * 300) - (effR * 4) + 60;
+        return Math.max(2, ie1);
+    },
+
+    bondStrength: function(sA, sB) {
+        var emA = sA.em || 0, emB = sB.em || 0;
+        var inA = sA.intake || 0, inB = sB.intake || 0;
+        var isA_N = emA > 0.2, isA_S = inA > 0.2;
+        var isB_N = emB > 0.2, isB_S = inB > 0.2;
+
+        if ((isA_N && isB_S) || (isA_S && isB_N)) {
+            if ((sA.hook === 'OUT' && sB.hook === 'IN') || (sA.hook === 'IN' && sB.hook === 'OUT')) return 100;
+            return 75;
+        }
+        if ((isA_N && isB_N) || (isA_S && isB_S)) return 0;
+        if (sA.spin !== sB.spin) {
+            if (sA.hook === 'OUT' && sB.hook === 'OUT') return 65;
+            return 45;
+        } else {
+            return 0;
+        }
+    },
+    layoutScore: function(bonds, nAtoms) { var total = 0; for (var i = 0; i < bonds.length; i++) total += bonds[i].strength; return Math.min(100, Math.round(total / Math.max(1, nAtoms * 50) * 100)); },
+    computeProfile: function(slots, dirs) { 
+        var p = {}; 
+        p.N = { size: slots.pn.length, spin: dirs.N.spin, hook: dirs.N.hook, capSeal: dirs.N.capSeal, em: this.northEmission(slots, dirs), intake: 0.05 }; 
+        p.S = { size: slots.ps.length, spin: dirs.S.spin, hook: dirs.S.hook, capSeal: dirs.S.capSeal, em: 0.05, intake: this.southIntake(slots, dirs) }; 
+        var self = this; 
+        ['E','W','F','B'].forEach(function(dir) { 
+            var key = {E:'ce',W:'cw',F:'cf',B:'cb'}[dir], arr = slots[key], dv = dirs[dir]; 
+            var em = self.carouselEmission(arr, dv.spin, dv.hook); 
+            p[dir] = { size: arr.length, spin: dv.spin, hook: dv.hook, capSeal: dv.capSeal, em: em, intake: (arr.length > 0 && arr.length % 2 === 0) ? Math.min(0.8, 0.2 + arr.length * 0.05) : 0.05 }; 
+        }); 
+        return p; 
+    }
+};
+
+var ATOMIC_WEIGHTS=[0,1.008,4.003,6.941,9.012,10.81,12.011,14.007,15.999,18.998,20.180,22.990,24.305,26.982,28.086,30.974,32.065,35.453,39.948,39.098,40.078,44.956,47.867,50.942,51.996,54.938,55.845,58.933,58.693,63.546,65.38,69.723,72.630,74.922,78.971,79.904,83.798,85.468,87.62,88.906,91.224,92.906,95.95,98,101.07,102.906,106.42,107.868,112.414,114.818,118.710,121.760,127.60,126.904,131.293,132.905,137.327,138.905,140.116,140.908,144.242,145,150.36,151.964,157.25,158.925,162.500,164.930,167.259,168.934,173.045,174.967,178.49,180.948,183.84,186.207,190.23,192.217,195.084,196.967,200.592,204.38,207.2,208.980,209,210,222,223,226,227,232.038,231.036,238.029,237,244,243,247,247,251];
+var ATOMIC_FORMS=[0,'gas','gas','solid','solid','solid','solid','gas','gas','gas','gas','solid','solid','solid','solid','solid','solid','gas','gas','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','liquid','gas','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','gas','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','liquid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid','solid'];
+var ATOMIC_CATS=[0,'Nonmetal','Noble Gas','Alkali Metal','Alkaline Earth','Metalloid','Nonmetal','Nonmetal','Nonmetal','Halogen','Noble Gas','Alkali Metal','Alkaline Earth','Post-Transition','Metalloid','Nonmetal','Nonmetal','Halogen','Noble Gas','Alkali Metal','Alkaline Earth','Transition','Transition','Transition','Transition','Transition','Transition','Transition','Transition','Transition','Transition','Post-Transition','Metalloid','Metalloid','Nonmetal','Halogen','Noble Gas','Alkali Metal','Alkaline Earth','Transition','Transition','Transition','Transition','Transition','Transition','Transition','Transition','Transition','Transition','Post-Transition','Post-Transition','Metalloid','Metalloid','Halogen','Noble Gas','Alkali Metal','Alkaline Earth','Lanthanide','Lanthanide','Lanthanide','Lanthanide','Lanthanide','Lanthanide','Lanthanide','Lanthanide','Lanthanide','Lanthanide','Lanthanide','Lanthanide','Lanthanide','Lanthanide','Lanthanide','Lanthanide','Lanthanide','Transition','Transition','Transition','Transition','Transition','Transition','Transition','Transition','Transition','Transition','Post-Transition','Post-Transition','Post-Transition','Post-Transition','Metalloid','Halogen','Noble Gas','Alkali Metal','Alkaline Earth','Actinide','Actinide','Actinide','Actinide','Actinide','Actinide','Actinide','Actinide','Actinide','Actinide','Actinide','Actinide','Actinide','Actinide','Actinide'];
+
+var CFG = { Proton: { radius: 1, color: 0xf00202 }, Neutron: { radius: 1, color: 0x02f002 }, Electron: { radius: 0.1, color: 0xf0f002 }, Stack: { scaleFactor: 1.1, Colors: [0x000000,0xa0a0a0,0x0f0ff4,0xff00ff,0xf01d17,0x0ff00f,0x00ffff] }, Charge: { scaleFactor: 7, maxOpacity: 0.4 }, Segments: 16, CarouselRadius: 6, PillarOffset: 5, CapOffset: 8.5, ParticleSize: 0.35 };
+
+
+var moleculeList = [ "H2O","NaCl","CO2","CH4","NH3","SF6","BaTiO3","LiF","C6H12O6","C2H5OH",    /* ... your full list from the file ... */    "AcBeH8","Ag2CrO4","Ag2Ga","Ag2Hg3","Ag2HgI4","Ag2O3S2","Ag2O4S","Ag2O4W","Ag2S","Ag2Y","Ag3","Ag3Ga","Ag3IS","Ag3O4P","Ag4","Ag5Eu","Ag7Hg2","Ag8B4F4O8","AgAl2O3","AgAu","AgAuS","AgBaCeCuO","AgBaCuDyO","AgBaCuGdO","AgBaCuOSm","AgBF4","AgCHO","AgCl","AgCO","AgF","AgF30NbO6Te6","AgF6Sb","AgGaS","AgGaS2","AgGeO","AgHe","AgHg","AgHgI","AgHgI3","AgI","AgIO3","AgKO3S","AgMnO4","AgN2O6Tl","AgN3","AgNa3O6S4","AgNb","AgNbO3","AgNbS","AgNiO","AgNO","AgO","AgO3V","AgO4Re","AgO4S","AgOSn","AgPO","AgS","AgY","Al","Al10La3O51Sr14Ta7","Al24BaO44Sr7","Al2Ba2Mg2O7","Al2Ba2O5","Al2BaO4","Al2Be2O15Si5","Al2Be3O18Si6","Al2Ca2O5","Al2CaO4","Al2Co2O5","Al2Cr3O12","Al2Eu","Al2Mo3O12","Al2Nb","Al2NiO4","Al2O12S3","Al2O12W3","Al2O3","Al2O3Rh","Al2O5Ti","Al2O7Ti2","Al2O9Si3","Al2O9Ti3","Al2O9Zr3","Al2S3","Al2Y","Al2Y3","Al3BiO6","Al3Ga2O12Y3","Al3Nb","Al3Ta","Al3Ti","Al3Y","Al3Zr","Al4Ba","Al4Eu","Al4O12Si3","Al5Nb3","Al5O12Y3","Al5Y","AlAs2Ga","AlAsGa","AlB2","AlBaCeMgO5","AlBaF5","AlBaOTi","AlBe","AlBNdO3Y","AlBr","AlCl","AlCl12Ti3","AlCl6Ti","AlCoCrMoNiTiW","AlEuO3","AlF3","AlF4Na","AlF6Na3","AlGa","AlHe","AlHoY","AlI3","AlNaO4Si","AlNaO8S2","AlNb","AlNb2","AlNb3","AlNdY","AlNi","AlO3Y","AlO4STl","AlO8S2Tl","AlPO","AlS","AlSb","AlTa","AlTi","AlTiV","AlY","AlY2","AlY3","Ar","Ar2Hg","ArBe","ArTl","As2Ba3O8","As2Ca3O8","As2CaO4","As2Fe","As2Fe3O8","As2Hg3O8","As2Na4O7","As2Ni3O8","As2O4Pb","As2O6Pb","As2O8Pb3","As2S3","As2S4","As3P","As4O16Pb3","As4O5","As4S4","As4S6","As5Nb3","AsBa2FO4","AsCu3S4","AsEu","AsF6K","AsF6Li","AsFe","AsFeO4","AsGa","AsGaO4","AsHgI4","AsI3","AsMn","AsNa3O4","AsNb","AsNi","AsNiS","AsO3","AsO3Sb","AsTl","AsTl3","AsZr","At2","AtI","Au","Au2Ba3","Au2Cl2","Au2Co","Au2Cr","Au2Cu","Au2Eu","Au2Ga","Au2Ga7","Au2Gd","Au2In3","Au2O","Au2O12Se3","Au2O3","Au2O3S2","Au2O4S","Au2Pt","Au2S","Au2S2","Au2S3","Au2Te3","Au2Th3","Au2Y","Au2Zr3","Au3Cd","Au3Co","Au3Cu","Au3Dy","Au3Eu7","Au3Hg","Au3W","Au4Y","Au5InPd4","Au5Y","Au7Y","Au8Cu6","Au8Y","Au9Cu","Au9Y","AuBe","AuBO","AuBr","AuBr2Na","AuBr3","AuBr4","AuBr4Cs","AuBr4K","AuBr4Na","AuBr4Rb","AuCd","AuCd3","AuCd5","AuCl","AuCl2","AuCl3","AuCl4","AuCl4Cs","AuCl4K","AuCl4Li","AuCl4Na","AuCl4Rb","AuCo","AuCo2","AuCo3","AuCr","AuCu","AuCu3","AuDy","AuEr","AuF3","AuF4","AuGa2","AuGd2","AuGe","AuHg","AuI","AuI3","AuI4K","AuInOSn","AuIrOPt","AuK3O6S2","AuK5O12S4","AuKO3S","AuKO6S2","AuN3O9","AuNa","AuNa3O6S2","AuNa3O6S4","AuNa5O12S4","AuNaO3S","AuNaO3S2","AuNaO6S2","AuNaO6S4","AuNb3","AuNd4","AuNi","AuPd","AuPdPt","AuTa3","AuW","AuW3","AuZn","AuZr","B","B2","B2Ba3O4S2","B2Ba3O6","B2BaF8","B2BaO4","B2Ca3O6","B2CaF8","B2CdF8","B2CoF8","B2Cu3O6","B2CuF8","B2CuO4","B2Eu2O4S2","B2Eu3O4S2","B2EuO4","B2F2S2","B2F4","B2F8Fe","B2F8Hg","B2F8Mg","B2F8Mn","B2F8Ni","B2F8Pb","B2F8Pd","B2F8Sn","B2F8Sr","B2F8Zn","B2Hf","B2Mg3O4S2","B2Mg3O6","B2MgO4","B2Mn3O6","B2Mo","B2Nb","B2NiO4","B2O2","B2O3","B2O4Pb","B2O6Sr3","B2O6Zn3","B2S3","B2Ta","B2Ti","B2U","B2V","B2W","B2Zr","B3Br3S3","B3Cl3O3","B3F12Fe","B3F12In","B3F12Sb","B3F3O3","B3F3S3","B4EuO7","B4K2O7","B4Li12O12","B4Li2O7","B4Na2O12","B4Na2O7","B4O7","B4Si","B5K15O15","B6Be","B6Eu","B6Gd","B6La","B6Si","B6Y","B8S16","B9CsS","Ba","Ba2CaO6W","Ba2Cu3OY","Ba2Hg","Ba2NaNb5O15","Ba2Nb2O7","Ba2O4Ti","Ba2O5Sc2","Ba2O6Si2","Ba2O6SrW","Ba2O7P2","Ba2O9Si3Zr2","Ba2Y","Ba3N2","Ba3O8P2","Ba3O8Sb2","Ba3O9WY2","Ba5O13P3","Ba5Tl3","Ba9F6O18Si6","BaBi3","BaBr2","BaBr2O6","BaBr6Si","BaBrF","BaCaMnO4Sr","BaCaOTi","BaCd","BaCdCl4","BaCl2","BaCl2O2","BaCl2O4","BaCl2O6","BaCl2O8","BaCl4F2Sn","BaCl6Si","BaClF","BaClO3","BaCoF4","BaCoFeOSn","BaCr2O7","BaCrO4","BaCuHoORh","BaCuMoO","BaCuO5Y2","BaCuOPb","BaCuOPt","BaF2","BaF3Li","BaF4Ni","BaF5Y","BaF6Si","BaF6Sn","BaFe12O19","BaFeO4","BaFeOPb","BaFeOSn","BaFeS","BaFO3P","BaGa","BaGa2","BaGa2S4","BaHe","BaHgI4","BaI2","BaI2O6","BaI2O8","BaK","BaMgO6Si2","BaMn2O8","BaMnO2","BaMnO3","BaMnO4","BaMoO","BaMoO3","BaMoO4","BaN2O4","BaN2O6","BaN6","BaNaNbO4","BaNb2O6","BaNb4O12Sr","BaNbO","BaNd2","BaNO3","BaO","BaO11Si3Zr2","BaO2","BaO3S","BaO3S2","BaO3Se","BaO3Si","BaO3Sn","BaO3Ti","BaO3Zr","BaO4P2","BaO4PdS","BaO4S","BaO4Se","BaO4SrTi","BaO4Te","BaO4W","BaO5S2Zn2","BaO5TiZr","BaO6S2","BaO6SrTi2","BaO6Ta2","BaO7Sc4","BaO7Si2Zn2","BaO8P2Ti","BaO8PbS2","BaO8PdS2","BaO8PtS2","BaO8RaS2","BaO8S2Sr","BaO9Si3Zr","BaO9Ti4","BaOPt","BaOSn","BaOW","BaPd","BaPo","BaPt2","BaS","BaSe","BaSi2","BaSO","BaSW","BaTe","BaY","BaZn2","BaZr","BBaO5P","BBeO2","BBiO3","BBr2F","BBr2I","BBr3","BBrClF","BBrClI","BBrF2","BBrFI","BBrS","BCaF4","BCdFO2","BCl","BCl2","BCl2F","BCl3","BClF2","BCoF4","BCr","BCsF4","BCsO2","Be","Be12Nb","Be12Ti","Be12V","Be2","Be2Cl4","Be2Cr","Be2Fe","Be2Hf","Be2Mg","Be2Mo","Be2Nb3","Be2O2","Be2O4Si","Be2Ti","Be2V","Be2W","Be2Zr","Be3F2O2","Be3O6P2","Be3O8P2","Be3P2","Be5Co","Be5Mn","Be5Pt","Be5Ta","BeBr2","BeCl","BeCl2","BeCl2O8","BeClF","BeCoCu","BeCu","BeF","BeF2","BeF2O2","BeF3","BeF3K","BeF3Na","BeF4","BeF4K2","BeF4Na2","BeFK","BeI2","BeI2O6","BeK2O8S2","BeMnO9Si3Zn","BeN2O6","BeNb3","BeNe","BeNi","BeNO3","BeO","BeO3S","BeO3Si","BeO3SiZn","BeO4S","BeO4Se","BeO4SiZn","BeO6Si2Zn","BeOW","BePd2","BePo","BePt","BeS","BeSb2","BeSe","BeTa","BeTe","BeTi","BeU","BeZr","BF2","BF2I","BF3","BF4","BF4K","BF4Li","BF4Na","BF4Ni","BF4NO","BF4NO2","BF4Rb","BF4Tl","BF7Si2","BFI2","BFS","BGaO3","Bi12O20Ti","Bi2Mo2O9","Bi2Mo3O12","Bi2O11Ti4","Bi2O12S3","Bi2O12W3","Bi2O3","Bi2O7Sn2","Bi2O7Ti2","Bi2O9Sn3","Bi2S3","Bi2Se3","Bi2Te3","Bi2Tl2","BI3","Bi3Eu","Bi3Eu4","Bi3Y","Bi4Ge3O12","Bi4O12Si3","Bi4O12Ti3","BiBr3","BiCdPbSn","BiCl3","BiClO","BiEu","BiF3","BiF5","BiI3","BiI3O9","BiI4K","BiIO","BiN3O9","BiNaO3","BiNb3","BiNi","BiNO4","BiO4V","BiPb","BiS","BiTi","BiTl","BiY","BK","BK3O3","BKO2","BLi","BLi3O3","BMn","BMo","BNa","BNa3O3","BNa3O4","BNaO2","BNaO3","BNb","BNbO3","BNi","BNi2","BNiO3","BO","BO2Tl","BO3","BO3Tl3","BO3Y","BO4P","BO7PVY","BP","Br","Br10Na2Rh2","Br2CaO6","Br2Cd","Br2Cl2Ge","Br2Cl2Hg","Br2Cl4N3P3","Br2CsI","Br2Eu","Br2Fe","Br2FPS","Br2Ga","Br2Hg","Br2Hg2","Br2Mg","Br2MgO6","Br2Mn","Br2Ni","Br2NiO6","Br2NiO8","Br2O2S","Br2O6Zn","Br2Os","Br2Pb","Br2Po","Br2Pt","Br2Ra","Br2Rh","Br2Ru","Br2S","Br2S2","Br2Sn","Br2Ta","Br2Ti","Br2U","Br2V","Br2W","Br3Cl3N3P3","Br3ClGe","Br3ClSi","Br3ClSn","Br3Eu","Br3EuO9","Br3Fe","Br3Ga","Br3Hg","Br3I","Br3Ir","Br3LaO9","Br3Mo","Br3Nb","Br3PS","Br3Re","Br3Rh","Br3Ru","Br3Sb","Br3Tc","Br3Ti","Br3Tl","Br3U","Br3V","Br4Cl2N2STe2","Br4Ge","Br4Hg","Br4Ir","Br4K2Pd","Br4K2Pt","Br4Li2Ni","Br4Pb","Br4Pd","Br4Pt","Br4Sn","Br4Ta","Br4Ti","Br4U","Br4W","Br4Zr","Br5ClN3P3","Br5KOs","Br5Nb","Br5P","Br5Ta","Br5U","Br5W","Br6EuSi","Br6IrK2","Br6IrK3","Br6IrNa2","Br6K2Os","Br6K2Pt","Br6K2Re","Br6Na2Os","Br6Na2Pt","Br6Os","Br6Pt","Br6Ta","BrCl","BrCl3Ge","BrCl5N3P3","BrClPb","BrClSn","BrClTl","BrF2P","BrF5S","BrGe","BrHg","BrHgI","BrHgO3","BrI","BrITl","BrN99Tc","BrNi","BrOPS","BrOs","BrTl","BTa","BTi","BW","BW2","C","C10Cl10","C10Cl10O","C10Cl12","C10Cl8","C10D18","C10F18O4","C10F22","C10Mn2O10","C10O20Ta2","C12Br3Cl5O2","C12Br6Cl2O2","C12Br8O2","C12Cl10","C12Cl10S2Zn","C12Cl11NO2","C12Cl11O4Tl","C12Cl11Tl","C12Cl8O2","C12ClF10Tl","C12F10NO3Tl","C12F18","C12F26","C12F8N4O4","C12Ir4O12","C12O12Os3","C12O12Ru3","C14F10O4","C14F14N2O","C15","C15Cl11K4N15O15","C15F18","C18F15Sb","C18F15Tl","C18F39N","C18Fe7N18","C2","C20F24","C21F48N2","C24F18","C24F20Ge","C24F51O9S3Y","C2Ag2O4","C2AgKN2","C2AuKN2","C2BaN2","C2Be","C2BeN2S2","C2BeO4","C2Br2","C2Br2ClF3","C2Br2F2","C2Br2F2O","C2Br2F6Ge","C2Br3O2","C2BrCl","C2BrClN2S","C2BrF3","C2Ca","C2CaMgO6","C2CaN2","C2CaN2S2","C2CdN2","C2CdO4","C2Ce2O4","C2Cl2F2","C2Cl2F3I","C2Cl2F4","C2Cl2N2S","C2Cl2N3S","C2Cl3F3","C2Cl3N","C2Cl3NaO2","C2Cl3O2Tl","C2Cl4F2","C2Cl4O","C2Cl4O2","C2Cl5F","C2Cl6","C2Cl6O2S","C2ClF3","C2ClF3O","C2ClF5","C2CoN2S2","C2Cu","C2CuKN2","C2CuN2","C2CuO4","C2D2O4","C2D3ClO","C2D3F3O","C2D3LiO2","C2D3NaO2","C2D4O2","C2D5I","C2D5NO2","C2D6S","C2F3","C2F3N3O6","C2F3NaO2","C2F3O2Tl","C2F4Se2","C2F6","C2F6FeO6S2","C2F6MnO6S2","C2F6NiO6S2","C2FeN2S2","C2FeO4","C2FN5O10","C2I2","C2I4","C2K2O4","C2KO4","C2KO4Ti","C2MgO4","C2MnN2S2","C2MnO4","C2N2","C2N2Na2S2","C2N2Ni","C2N2NiS2","C2N2O2","C2N2Pb","C2N2PbS2","C2N2Se","C2N2Zn","C2N4O6","C2N6O12","C2Na2O4","C2O4Pb","C2O4Ta","C2O4Tl2","C2O4V","C2O4Zn","C2O5V","C2O6U","C2O6Zr","C32Br6Cl10CuN8","C3AgF5O2","C3Bi2O9","C3BiF9O9S3","C3BrN","C3CaO5","C3Cl2F6","C3Cl2KN3O3","C3Cl2N3NaO3","C3Cl3F5","C3Cl3F5O","C3Cl4F4","C3Cl4O","C3Cl4O3","C3Cl4S2","C3Cl6","C3Cl6N6","C3Cl6O","C3Cl8","C3ClF5","C3ClF5O","C3ClF7","C3ClIrO3","C3CuN3Na2","C3D2F6O","C3D6O2","C3D8","C3D8O","C3F3N3","C3F6O","C3F7","C3F8","C3F9FeO9S3","C3F9O6S3Y","C3F9O9S3Tl","C3F9O9S3Y","C3F9Sb","C3N3Y","C3OS","C4","C4As4F12","C4BaN4Pt","C4BrF6N","C4CaF12N2O8S4","C4Cl2F4O2","C4Cl2N2","C4Cl3F7","C4Cl4F6","C4Cl4O","C4Cl5N3","C4Cl6O","C4CoO4","C4D10O","C4D10O2","C4D6O3","C4F10O","C4F12Ge","C4F12N2NiO8S4","C4F6","C4F6N2O","C4F6O3","C4F6O4Pb","C4F8","C4F8S2","C4K2MgO8","C4K2N4Ni","C4K2N4Pt","C4K2N4Zn","C4K2O10Os","C4K2O9Ti","C4KO8Y","C4N4Os","C4O8Ti","C5Cl2F3N","C5Cl2F6","C5Cl5F7O","C5Cl5N","C5Cl6","C5Cl8","C5ClO5Re","C5F10","C5F12","C5F4","C5F6O3","C5F8","C5FeN6Na2O","C5FeN6Na4O","C5K2O15Zr2","C6Bi2O12","C6Br2Cl3F9","C6Br2Cl4","C6Br3F3","C6Br4S2","C6BrF13","C6BrF5Tl","C6Cl3N3O6","C6Cl4O2","C6Cl5F","C6Cl5I","C6Cl5KN6O6","C6Cl5KO","C6Cl5NaO","C6Cl5NO2","C6Cl9O6Y","C6ClF13O2S","C6CoK3N6","C6CrK3N6","C6D12O","C6D4ClNO2","C6D5Br","C6D6","C6D6N2O2","C6F10O3","C6F12O2","C6F5SeTl","C6F8O4","C6F9O6Tl","C6FeK3N6","C6FeK4N6","C6FeN6","C6FeN6Na3","C6FeN6Na4","C6FeN6Os","C6FeN6Ti","C6I6","C6IrK3N6","C6K2O6","C6K3O12Sb","C6MoO6","C6N2","C6N4","C6N6O6","C6N6Os","C6N6Os3","C6Na2O6","C6O12Sb2","C6O12Ti2","C6O12Y2","C6O6W","C7Br4O4S","C7D5ClO","C7D7Cl","C7F14O2S","C7F14O3","C7F15NaO2S","C8Br4NiO4","C8Br4O3","C8Cl2N2O2","C8Cl4N2","C8Cl6O2","C8Co2O8","C8D8O","C8F13NO2","C8F16","C8F16O","C8F17I","C8F17NaO2S","C8F18","C8F4N2","C8F6N2","C9D11NO2","C9D11NO3","C9D18N6","C9F16","C9F19I","C9F20O2S","C9F7N","Ca","Ca2FO4P","Ca2O4Si","Ca2O4Ti","Ca2O7P2","Ca3O18P6","Ca3O8P2","CaBr","CaCl2","CaCl2O4","CaCl2O8","CaCl3NaO3","CaCO","CaCr2O7","CaEu","CaF2","CaF5Y","CaF6Si","CaF6Ti","CaFeGeO8YZr","CaGa2O4","CaGa2S4","CAgN","CAgNO","CaI2","CaI2O6","CaMn2O8","CaMoO4","CaN2O4","CaNb","CaO","CaO2","CaO3S2","CaO3Se","CaO3Si","CaO3Sn","CaO3Ti","CaO3Zr","CaO4S2","CaO4Te","CaO4W","CaO6P2","CaO6S2","CaO8Re2","CaS5","CaSe","CaY","CBaO3","CBe2","CBeO3","CBi2O5","CBr2Cl","CBr2Cl2","CBr2ClNO","CBr2F2","CBr2N2O4","CBr3NO2","CBr4","CBrCl3","CBrF2","CBrF3","CBrN","CBrN3O6","CBrNO","CCaIrO3","CCaN2","CCaO3","CCaO3Pd","CCdO3","CCl2F2","CCl2N2Os","CCl2O","CCl3F","CCl3NO2","CCl4","CCl4S","CCl4STi","CClF3","CClF3O2S","CClFNRY","CClN","CClORa","CClOY","CClP","CCoO3","CCrO3","CCs2O3","CCuN","CCuNS","CCuO3","Cd","Cd2ClO4P","Cd2Eu","Cd2Nb2O7","Cd2Ni5","Cd2O7P2","Cd2O7Ta2","Cd2SSe","CD3BN","CD3BNNa","CD3I","Cd3Mg","Cd3O8P2","Cd3P2","CD3S","CD4N2O","CD5N","CD6ClN","Cd6Eu","Cd6Y","CDBr3","CdCl2","CdCl2O8","CdCl4K2","CdCrO4","CdF2","CdF6Si","CdI2","CdI2O6","CdMoO4","CdN2O6","CdNb2O6","CdO","CdO3S","CdO3Si","CdO3SSe","CdO3Te","CdO3Ti","CdO3Zr","CdO4S","CdO4Se","CdO4Te","CdO4W","CdO6Ta2","CdOPb","CdPbS","CdPo","CdS","CdS2Zn","CdSe","CdTe","Ce2O12S3","Ce2O7Ti2","Ce2S3","Ce3Ga","Ce3Ni","Ce4O3S3","CeF7Ti","CeGa2","CeI3","CeIr2","CeNb","CeO4P","CeO4Zr","CeO5Y2","CeO8S2","CeOPb","CeOS","CeOs2","CeOTiW","CeTl3","CF3","CF3GeI3","CF3I","CF3O3STl","CF4","CF5N3","CF6N2","CF8N4","CFeO3","CFN3O6","CFNS","CI4","CIN","CIN3O6","CINO","CINS","CK2O3","CKN","CKNO","CKNS","Cl","Cl10Nb2","Cl12Ga4","Cl201Tl","Cl202Tl","Cl218OS","Cl2223Ra","Cl299Tc","Cl2CsI","Cl2Eu","Cl2EuO","Cl2F2Ge","Cl2F2Sn","Cl2F3NP2S","Cl2F3Sb","Cl2F4N3P3","Cl2Fe","Cl2FeO4","Cl2FeO8","Cl2Ga","Cl2Gd","Cl2Ge","Cl2I","Cl2I2Sn","Cl2In","Cl2IRb","Cl2Mg","Cl2MgO6","Cl2MgO8","Cl2Mn","Cl2MnO8","Cl2Mo","Cl2MoO2","Cl2N2O2S2Te","Cl2N2STe2","Cl2N4Pt","Cl2Nb","Cl2Ni","Cl2NiO6","Cl2NiO8","Cl2O2U","Cl2O2W","Cl2O6Pb","Cl2O6Sr","Cl2O8Pb","Cl2O8Sr","Cl2Os","Cl2OTi","Cl2OV","Cl2OZr","Cl2Pb","Cl2Po","Cl2Pt","Cl2Ra","Cl2Re","Cl2Ru","Cl2S2Se","Cl2S5Se2","Cl2Sr","Cl2Ta","Cl2Ti","Cl2Tm","Cl2W","Cl2Y","Cl2Zn","Cl2Zr","Cl367Ga","Cl390Y","Cl391Y","Cl3CoN6","Cl3CrO12","Cl3CsGe","Cl3Eu","Cl3EuO12","Cl3Fe","Cl3FeO12","Cl3FeO6","Cl3FSn","Cl3Ga","Cl3GaO12","Cl3Gd","Cl3I","Cl3In","Cl3Ir","Cl3Mo","Cl3N","Cl3N3S3","Cl3N5Ru","Cl3N6Ru","Cl3Nb","Cl3NORu","Cl3O12Tl","Cl3O9S3Y","Cl3Os","Cl3PS","Cl3Re","Cl3Ru","Cl3Sb","Cl3Si","Cl3Sm","Cl3Sn","Cl3STa","Cl3Ta","Cl3Tb","Cl3Ti","Cl3Tl","Cl3Tm","Cl3U","Cl3V","Cl3Yb","Cl3Zr","Cl4Fe","Cl4FN3OP2S","Cl4FSb","Cl4Ga2","Cl4GaLi","Cl4Ge","Cl4Ir","Cl4IrK","Cl4K2Pd","Cl4K2Pt","Cl4Li2Mn","Cl4LiY","Cl4Mo","Cl4MoO","Cl4Na2Pt","Cl4Nb","Cl4O16Pb","Cl4O5Sn","Cl4ORe","Cl4OW","Cl4P2","Cl4Pb","Cl4Pd","Cl4Po","Cl4Pt","Cl4Ru","Cl4Sn","Cl4Ta","Cl4Tc","Cl4Te","Cl4Ti","Cl4Ti2","Cl4U","Cl4V","Cl4W","Cl4Zn","Cl4Zr","Cl5Eu2","Cl5IrKNO","Cl5K2NORu","Cl5K2NOs","Cl5K2Ru","Cl5Mo","Cl5N3OP2S","Cl5NaOs","Cl5Nb","Cl5NOs","Cl5Re","Cl5Sb","Cl5Ta","Cl5W","Cl6Cr","Cl6EuSi","Cl6Ge2O","Cl6Ir","Cl6IrK2","Cl6IrK3","Cl6IrNa2","Cl6IrNa3","Cl6K2Os","Cl6K2Pd","Cl6K2Pt","Cl6K2Re","Cl6K2Ru","Cl6K3Os","Cl6Mo","Cl6N2Ta2","Cl6Na2Os","Cl6Nb","Cl6Os","Cl6Pd","Cl6Pt","Cl6Ru","Cl6Ta","Cl6Ti","Cl6Tl","Cl6W","Cl7NbPb","Cl8Ir2","Cl9Re3","ClCu","ClEu","ClF2","ClF2PS","ClF3Ge","ClF5","ClFMg","ClFO2","ClFSn","ClGa","ClI","CLi2O3","ClIr","ClK","ClKO","ClKO3","ClKO4","ClLiO","ClLiO3","ClLiO4","ClN3","ClN99Tc","ClNa","ClNa13O17P4","ClNaO3","ClNi","ClNO","ClNOS","ClNS","ClO","ClO2","ClO2SY","ClO3","ClO3Tl","ClO4Tl","ClOs","ClOSb","ClPd","ClPS","ClRb","ClSY","ClTi","ClTl","CMgO3","CMnO3","CMo2","CN","CN2O3","CN2O4","CN2Ti","CN4O8","CNa2O3","CNa3O5P","CNiO3","CNNa","CNNaO","CNNaS","CNO","CNSTl","CNTi2","CNTl","CO","CO2","Co2Eu","Co2Fe2O5","Co2Nb","Co2Nb2","Co2O12S3","Co2S3","Co2Ta","Co2Ti","Co2Y","Co3Ir","Co3Nb","Co3Nb2","Co3O8P2","CO3Pb","CO3Rb2","CO3Sr","Co3Ta","CO3Ti","CO3Tl","CO3Tl2","Co3W","Co3Y","Co3Y4","CO4","Co4Nb","Co5Ir2","Co5Nb4","CO5P","Co5Sm","Co5Y","Co5Y8","Co7Nb2","Co7W6","Co7Y2","Co7Y9","CoCrMo","CoCrO4","CoFeS","CoGa2Pd22","CoI2","CoIr3","CoK2O8S2","CoLaNi","CoMoNiO","CoMoNiS","CoMoO4","CoN6Na3O12","CoNb","CoNb2","CoNi","CoNi5","CoNiO2","CoNiOPtW","CoO3Sn","CoO3Ti","CoO4W","CoOPb","COOs","CoS","CoS2","CoSb","COSe","CoTa","CoTa2","CoTaZr","CoTi","CoU","CoY3","Cr","Cr2K2O7","Cr2Li2O7","Cr2MgO7","Cr2Nb","Cr2Ni3","Cr2NiO7","Cr2O12S3","Cr2O3","Cr2O5Ti","Cr2O7Rb2","Cr2O7Sr","Cr2O7Tl2","Cr2O8Pb","Cr2O8Sn","Cr2Os","Cr2S3","Cr2Ti","Cr2U","Cr3Os","Cr3Ta2","Cr3Ti","Cr3Ti2","Cr6Fe2O21","Cr9Y","CrCs2O4","CrCuO","CrCuO4","CrFeNi","CrGa4","CrGe","CrI2","CrI3","CrKO","CrKO5Zn","CrKO8S2","CrKOZn","CrMgO4","CrMnO4","CrNaO8S2","CrNb","CrNbO4Ti","CrNi","CrNiO4","CrO","CrO4P","CrO4Pb","CrO4Rb2","CrO4S","CrO4Sn","CrO4Sr","CrO4Tl2","CrO5Pb2","CrO8Pb2S","CrOSn","CrPo","CrS","CrS2","CrSb","CrTi","CS2","Cs2O13Ti6","Cs2O3Ti","Cs2O4W","Cs2O7U2","Cs2S","Cs3O4V","CsF6Sb","CsFO4S","CsI","CsMnO4","CsNbO3","CsNO3","CsO","CsO3V","CsO4Re","CsOW","CTa","CTi","Cu2Eu","Cu2Nb","Cu2O3S","Cu2Po","Cu2Y","Cu3Ga","Cu3O6S2","Cu3P2","Cu4Ti","Cu4Ti3","Cu4Y","Cu5Eu","Cu5Y","Cu7Y","Cu9Ga4","CuCO","CuFeMnNi","CuGa","CuGa2","CuGaInS","CuGaSe2","CuGeSe","CuI","CuI2","CuI2O6","CuMgMoS","CuMnNi","CuN2O6","CuNb2O6","CuNb3","CuNi","CuNi7","CuO","CuO3Si","CuO3Sn","CuO3Ti","CuO3Zr","CuO4W","CuO8S2Zn","CuOPb","CuOSn","CuPo","CuTi","CuTl","CuY","CV","CW","CW2","CZr","D15K6Y3","D2Cl3EuO","D2N","D2O4S","D3B","D3BO3","D4AlLi","D4BNa","D6N2O4S","D815N2O4S","D8N2O4S","DI","DNO","DS","Dy2O12S3","Dy2O3","DyGa6","DyI3","DyIr3","DyNi2","DyRe2","Er2O3","Er2S3","Er3Tl5","Er4Tl5","ErF10LiTmY","ErI3","ErN3O9","Eu2","Eu2Mg3N12O36","Eu2O12S3","Eu2O12W3","Eu2O2S","Eu2O3","Eu2O9Ti3","Eu2S3","Eu2Sb3","Eu3O8P2","Eu3Rh","Eu4O24P6","Eu5Hg4","Eu5O55P11V5Y5","Eu5Rh2","Eu9Rh","EuF","EuF2","EuF3","EuF6Pt","EuF6Si","EuGa2","EuGa2O4","EuGa2S4","EuI2","EuI3","EuI3O9","EuIn3","EuIr2","EuMg2","EuMg4","EuMg5","EuMgN5O15","EuMoSSn","EuN","EuN2O6","EuN3O9","EuNaO8S2","EuNi5","EuO2V","EuO3Ti","EuO3V","EuO3Y2","EuO4P","EuO4S","EuO4W","EuOW","EuP","EuPb3","EuPd3","EuPt5","EuS","EuSb","EuSb2","EuSe","EuTe","EuTl3","EuW","EuZn5","F","F10S2","F12N2S3","F12NiP4","F2Fe","F2Gd","F2Ge","F2Hg","F2Hg2","F2IP","F2K","F2LiNO4S2","F2Mg","F2Mn","F2Mo","F2Nb","F2NbO","F2Ni","F2O2S","F2O2U","F2O6S2","F2Os","F2Pb","F2PS","F2S","F2S2","F2S2W","F2Se","F2Sn","F2Ti","F2W","F2Y","F2Zr","F3Fe","F3FeO3","F3Ga","F3Ga2O9P3","F3KNbO","F3KNi","F3Mn","F3Mo","F3Nb","F3NO3S","F3NO4S2","F3NS","F3O3PS2","F3P","F3Pu","F3Rh","F3Sb","F3SW","F3Ti","F3Tl","F3Tl3","F3U","F3W","F3Y","F4Ge","F4Ge2","F4K2Ni","F4Mo","F4MoS","F4Nb","F4O2Os","F4P2","F4Pb","F4Pt","F4S","F4S2","F4S3","F4Sn","F4SW","F4Ti","F4Ti2","F4U","F4U2","F4V","F4Y","F5I","F5K2NbO","F5KTi","F5Mo","F5Nb","F5NP2","F5NP2S","F5Pu","F5Sb","F5Ta","F5U","F5W","F6Fe","F6FeNa3","F6GeK2","F6GeMg","F6GeNa2","F6Ir","F6IrK2","F6K2Ni","F6K2Si","F6K2Sn","F6K2Ti","F6K2Zr","F6KNb","F6KSb","F6KTa","F6Li2Sn","F6Li2Ti","F6LiSb","F6MgSi","F6MgZr","F6Mo","F6N2Ti","F6Na2Sn","F6Na2Ti","F6NaSb","F6NaTa","F6Nb","F6NiSi","F6NiZr","F6NO2Sb","F6NOSb","F6O18P6Tl12","F6Os","F6OTi","F6P","F6PbSi","F6PTl","F6Re","F6S","F6Sb","F6SnZr","F6SrTi","F6Tc","F6Ti","F6U","F6W","F7I","F7K2Nb","F7K2Ta","F7K3Ni","F7Nb","F7NS","F7NS2","F7Re","F9NbTi","Fe","Fe2MgO4","Fe2N4O4S2","Fe2Nb","Fe2Nb3","Fe2Ni2O5","Fe2NiO4","Fe2O12S3","Fe2O3","Fe2O4Ti","Fe2O5Ti","Fe2O7Ti2","Fe2S2","Fe2S3","Fe2Ta","Fe2Ti","Fe2Y","Fe2Zr","Fe3Ga4","Fe3Nb","Fe3S4","Fe4O21P6","Fe4Y","Fe5O12Y3","Fe5Ti","Fe5Y","Fe6Ga5","Fe7Ta3","Fe9Y","FeI2","FeI3","FeInOSn","FeLiO2","FeMnOSnSr","FeMoO4","FeN3O9","FeNb2","FeNb2O6","FeNbO","FeNbOPbW","FeNbS","FeNi","FeNi3","FeNi4S4","FeNi5","FeNiOW","FeO","FeO2","FeO2Ti","FeO3","FeO3Si","FeO3Ti","FeO3Y","FeO4P","FeO4S","FeO4W","FeOPb","FeOSr","FeOW","FeP","FeRh","FeRh2","FeS","FeS2","FeSb2","FeTi","FeTi4","FeV","FGa","FGaO","FGe","FHg","FI","FI2PS","FIO4S","FKO2S","FKO2Ti","FKTi","FKY","FLiY","FN3O2S4","FNa","FNaTi","FNbO2","FNO2","FNS","FO","FO2S","FO3PSn","FOS","FPS","FPS2","FTl","FY","Ga","Ga2I4","Ga2Ir","Ga2La","Ga2Mg5","Ga2MgO4","Ga2MgS4","Ga2Ni3","Ga2O","Ga2O12S3","Ga2O12Se3","Ga2O3","Ga2O4Sr","Ga2O4Zn","Ga2Pd5","Ga2Pr","Ga2Re3","Ga2Ru","Ga2S2","Ga2S3","Ga2S4Sr","Ga2Sb","Ga2Sc","Ga2Se","Ga2Se2","Ga2Se3","Ga2Sm","Ga2Tb","Ga2Th","Ga2Tm","Ga2U","Ga2Yb","Ga2Zr","Ga3La5","Ga3Nb","Ga3Nb5","Ga3Ni2","Ga3Os","Ga3Pt5","Ga3Rb","Ga3Re","Ga3Rh","Ga3Ru","Ga3Sc2","Ga3Sm5","Ga3Ti2","Ga3Tm","Ga3U","Ga3U2","Ga3Y2","Ga3Zr2","Ga4La","Ga4Nb","Ga4Ni","Ga4Sc5","Ga4V","Ga5Gd3O12","Ga5Ir3","Ga5La","Ga5Mg2","Ga5Mn8","Ga5Pb","Ga5V2","Ga5V6","Ga6Ir","Ga6La","Ga7Rb","Ga9Rh2","GaGd","GaGdO3","GaI","GaI3","GaIn","GaInOSn","GaInSe","GaLa3O6","GaLa4","GaLiO2","GaMg","GaMg2","GaMoO","GaMoPbS","GaN","GaN3","GaN3O9","GaNb","GaO3P","GaO4P","GaO4S","GaO4Sb","GaOSn","GaOZn","GaP","GaRh","GaS","GaSb","GaSc2","GaSe","GaTe","GaTi2","GaV3","GaW3","GaY","GaYb","GaZr2","Gd2O12S3","Gd2O3","Gd2O7Ti2","Gd2S3","Gd2Tl","Gd3Rh2","Gd3Tl5","Gd4O3S3","Gd5Tl2","Gd7Rh3","GdHg","GdI3","GdIr2","GdN3O9","GdSb","GdTl3","Ge2N","Ge2N2O","Ge2O3","Ge3N4","GeI2","GeI4","GeInOW","GeLi2O3","GeMg2O4","GeN12","GeNa","GeNa2O3","GeNaO4Y","GeNb","GeNb3","GeO","GeO2","GeO3Pb","GeOW","GeS","GeS2","GeSe","GeSe2","GeTe","GeTe2","H","H106Eu4Mo29N12O129","H10B4N2O8","H10BaNb2O6","H10BaO6Ta2","H10BiN3O14","H10CdO6Ta2","H10Ce2Sn5","H10Ce3Sn5","H10Cl2Na2O7","H10Cl4O5Sn","H10ClNaO6","H10CuGaSe10","H10CuNb2O6","H10EuN3O14","H10Ge4","H10KNaNb2O6","H10Mn8Sn5","H10N2O2Pt","H10Na2O8S2","H10Nb2","H10Nb2O5","H10Nb2O6Zn","H10Nb6Sn5","H10O10SV","H10Pb3Sn2","H10Pb4Sn","H11AsGe2","H11ClN7Os","H11Ga3Sn","H11Na2O8Si","H11NbO16Si4","H125I","H12Al2Ge3","H12AlB3","H12AuGe3","H12AuN4","H12B2CoF8O6","H12B2CuF8O6","H12B2F8FeO6","H12B2F8NiO6","H12B4U","H12B6Y","H12BaO6Ta2","H12BF4NiO6","H12BN3O3","H12Br2MgO6","H12Ca2Cl4O12","H12CdCl2O14","H12Ce5Ge3","H12Cl2CoO6","H12Cl2MnO14","H12Cl2N4O2Os","H12Cl2NiO14","H12Cl2NiO6","H12Cl3EuO12","H12Cl3EuO6","H12Cl3GaO12","H12Cl3O18Tl","H12Cl6IrN3","H12Cl6IrNa2O6","H12Cr2O7Tl2","H12Cu5Ge3","H12CuN4","H12DyGe3","H12EuN3O15","H12EuNO9","H12F6GaN3","H12F6MgO6Si","H12GaN3O15","H12Ge3Nb","H12Ge3Nb5","H12Ge3Ni5","H12Ge3Np","H12Ge3Os2","H12Ge3Pt2","H12Ge3Pu","H12Ge3Re5","H12Ge3Ru2","H12Ge3Sc5","H12Ge3Ta5","H12Ge3Ti5","H12Ge3U","H12Ge3V5","H12Ge3Y","H12Ge3Zr5","H12Ge5","H12MgN2O12","H12MnN2O12","H12N2Ni2O12S3","H12N2NiO10S2","H12N2NiO12","H12N3O15Tl","H12N3O4P","H12N4Pt","H12N6O6Pt","H12Nb2O6Pb","H12Nb2O6Po","H12NiO10P2","H12NiO10S","H12O6PbTa2","H12Si5","H13AsFeO9","H13BNaO8","H13F6O6Sb","H13Ge3Si","H13GeSi3","H14Ce3Sn7","H14Cl6IrN3O","H14Cl6O6Pt","H14ClNaO8","H14CoO11S","H14CuN4O5S","H14EuGdN6O25","H14FeO11S","H14Ge6O5","H14HgSn7","H14N2O14U","H14N3O10P3","H14NaNbO10","H14NiO11S","H14O11SZn","H14O7Re2","H15AsNa2O11","H15Ca3Ga5","H15Cl3CoN5","H15Cl3IrN5","H15Cl3N5Ru","H15Eu3Ga5","H15Ga5Re","H15Ga5Rh3","H15Na2O11P","H16As2S3","H16AuGe4","H16Ba2Ca2Cu3HgO8","H16Cd3O20S3","H16CdO12S","H16Eu2O20S3","H16Eu3K15O95SbW24","H16GaN3O17","H16Ge4Rb","H16Ge4Rh","H16Ge4Sc5","H16Ge4Sm5","H16Ge4Tb5","H16Ge4U3","H16Ge4Y5","H16Ge4Yb5","H16HgSn8","H16MgNO10P","H16O4Sn4","H17Ga5Pb","H18Al2O21S3","H18B4N2O12","H18B6Be","H18Br3EuO9","H18Cl2O9Zr","H18Cl3N6Ru","H18EuO9","H18FeN3O18","H18Ga6Li","H18Ga6Y","H18GaN3O18","H18I2N6Ni","H18N3O43PW12","H18Na2O12Si","H18O16S2Th","H2","H20B4Na2O17","H20CrNa2O14","H20FeN2O14S2","H20Ge5Ir4","H20Ge5Ti6","H20Ge5Yb3","H20N2NiO14S2","H20Na2O14S","H20Na3O14P","H2115Sn","H2117Sn","H2119Sn","H2121Sn","H2123Sn","H2124Sn","H2127Sn","H21Al7Ta","H21Ga7Li2","H21HP","H2209Pb","H2210Po","H22O20S3Y2","H235S","H24Al8Ge6","H24F18N5Nb3O","H24Ge6In8","H24Ge6Ir7","H24Ge6Rh7","H24Na3O16P","H25K3Li2Nb5O15","H25Na2O16P","H26Ge11O18","H26Mo7N6O25","H26N6O40W12","H27AlKO20S2","H27Eu5Ga9","H28AlNO20S2","H28Cr4Ge7","H28FeNO20S2","H28N6O41W12","H2Ag2O3S2","H2Ag2O4S","H2AgCuPdSn","H2AgCuSnZn","H2AgN2O6Tl","H2AgSn","H2Al2O6Si","H2AlBeCrOSi","H2AlF2O","H2AlF3O10S3","H2As3GaZn","H2As3Tl","H2AsKO4","H2AsO8PSn","H2Au2O","H2Au2O4","H2AuBr4KO","H2AuBr4NaO","H2AuCl3O","H2AuCl4KO","H2AuCl4NaO","H2AuClP","H2AuNa3O6S4","H2AuNaO4S2","H2AuPY","H2AuSn","H2B","H2B2Be","H2B2CuF8O","H2B2F8FeO","H2B2MgO5","H2B2O5Pb","H2B2O7Pb3","H2B4K2O8","H2B4Li2O7","H2B4MnO8","H2B4Na2O8","H2B4O7","H2B4Si","H2BaCl2O7","H2BaI2O7","H2BaN2O5","H2BaO4S2","H2BBr","H2BCl","H2Be","H2Be2O","H2Be2O2","H2BeO","H2BeO2","H2BeTe","H2BFe","H2BFO2","H2BiCdPbSn","H2BiCdPdSn","H2BiNaO4","H2BiNO5","H2BiOPb","H2BiPb","H2BiPbSn","H2BLi","H2BMo","H2BN","H2BNa","H2BNaO3","H2BNaO4","H2BNaO5","H2BNb","H2BO2Tl","H2BO5P","H2Br2CdO","H2Br2CdO7","H2Br2Ge","H2Br2NiO","H2Br2O6Pb","H2Br2Pb","H2Br2Sn","H2Br3EuO","H2Br3IrO","H2Br4Pt","H2Br6Os","H2BrClSn","H2BrTl","H2BTa","H2BV","H2BW","H2Ca","H2Ca10O26P6","H2Ca2O9S2","H2CaCl2O","H2CaCr2O8","H2CaI2O","H2CaMn2O9","H2CaN2O7","H2CaO3S","H2CaO4S","H2CaO5S","H2CaO9P2","H2CdCl2O","H2CdCl2O9","H2CdHgS","H2CdO2","H2CdO3Se","H2CdO5S","H2CdTe","H2Ce3Sn","H2Cl2Ga","H2Cl2Ge","H2Cl2HgO8","H2Cl2HgO9","H2Cl2MgO","H2Cl2MnO","H2Cl2MnO9","H2Cl2NiO","H2Cl2O2U","H2Cl2O2Zr","H2Cl2O8Pb","H2Cl2O9Pb","H2Cl2OZr","H2Cl2Pb","H2Cl2Si","H2Cl2Sn","H2Cl3CsGe","H2Cl3EuO","H2Cl3EuO13","H2Cl3GaO13","H2Cl3IrO","H2Cl3NO2Ru","H2Cl3O13Tl","H2Cl3O13Y","H2Cl3OOs","H2Cl3ORu","H2Cl3OTl","H2Cl3OTl3","H2Cl4IrO","H2Cl4OSn","H2Cl5IrK2O","H2Cl5K2ORu","H2Cl6Ir","H2Cl6IrK3O","H2Cl6IrNa2O","H2Cl6IrNa3O","H2Cl6Os","H2Cl6Pt","H2ClGa","H2ClHgN","H2ClNaO5","H2ClNO3","H2ClO3","H2ClTl","H2CoMoO5","H2CoSn","H2Cr2CuO8","H2Cr2Na2O8","H2Cr2O7Tl2","H2Cr2O8Sn","H2Cr3Sn","H2CrMgO5","H2CrNiO5","H2CrO4Pb","H2CrO4Tl2","H2CrO5Zn","H2Cu3O10S2","H2Cu3O2","H2CuNb2O6","H2CuO5S","H2CuSn","H2Eu2O","H2Eu2O13S3","H2Eu2S2","H2EuGe2O4","H2EuN3O10","H2EuNaOW","H2EuNb2O6","H2EuO","H2EuO2","H2EuO4S","H2EuO4W","H2EuO5P","H2EuOSnW","H2EuSi2","H2EuTe","H2F2Ge","H2F3GaO","H2F3PSi","H2F4SSi2","H2F5NbO2","H2F6GeSi","H2F6Zr","H2Fe2O13S3","H2Fe2O4","H2Fe4O22S5","H2FeGaOPb","H2FeLiSi","H2FeNbOPbW","H2FeO4S","H2FeO5P","H2FeO5S","H2FeSi","H2FN","H2Ga","H2Ga2O13S3","H2Ga2O3","H2GaInSn","H2GaN","H2GaN3O10","H2GaP","H2GaS","H2GaSb","H2GaSn","H2GaTe","H2GaTe2","H2Ge2O3","H2Ge2O4Pb","H2GeI2","H2GeO","H2GeO2","H2GeOPb","H2GeS","H2GeTe","H2HeO","H2Hf","H2Hg2O","H2Hg2O4S","H2HgN2O6Tl","H2HgN2O7","H2HgNO4","H2HgO","H2HgO2","H2HgO4S","H2HgTe","H2I2NiO","H2I2Pb","H2I2Si","H2I3ORu","H2IIn","H2ILiO","H2In5Sn","H2INa3O6","H2InSn","H2IrO2Ru","H2ITl","H2K2MnO5","H2K2O4S","H2K2O4S2","H2K2O4Sn","H2K2O4Te","H2K2O5Os","H2K2O7P2","H2K2O7Sb2","H2K3P","H2K4O13S3","H2KO4P","H2LaMoOPb","H2Li2O5S","H2LiO4P","H2Mg","H2Mg3O9P2","H2MgMn2O9","H2MgNbO","H2MgO2","H2MgO4S2","H2MgO4Si","H2MgO5S","H2MnN2O7","H2MnNa2O5","H2MnNaO5","H2MnO","H2MnO2","H2MnO5P","H2MnO5P2","H2MnO5S","H2MnOPbW","H2MoO4","H2N2O2","H2N2O6Pb","H2N2O8Zr","H2N2O9U","H2N2W","H2N3Tl","H2N6Pb","H2Na2O4S2","H2Na2O4Si","H2Na2O4Te","H2Na2O5Se","H2Na2O5W","H2Na2O6S4","H2NaO4V","H2NaOP","H2NaOWZn","H2Nb","H2Nb2O6","H2Nb2O6Pb","H2Nb2O6Zn","H2Nb2Sn","H2Nb3Pb","H2NbO","H2NbO2","H2NbO3","H2NbOPbW","H2NbOTi","H2NbS","H2NbSi2","H2NbSn","H2Ni3O9P2","H2NiO","H2NiO2","H2NiO3","H2NiO4S","H2NiO8Sb2Ti","H2NiSn","H2NiTe","H2NNaO","H2NNaO3S","H2NNbO2","H2NO2PoS","H2O","H2O10W3","H2O12S3Sn","H2O2","H2O2Pb","H2O2Pt","H2O2Ra","H2O2Sn","H2O2U","H2O3Pt","H2O3Ru","H2O3S","H2O3Sb","H2O3Se","H2O3Sn","H2O3W","H2O4P","H2O4Pb3","H2O4PbS","H2O4PbW","H2O4ReTl","H2O4S","H2O4Se","H2O4STl","H2O4STl2","H2O4Te","H2O4U","H2O4W","H2O5Pb2S","H2O5Si2","H2O5STi","H2O5SZn","H2O6PbTa2","H2O6S3","H2O7P2","H2O7S2","H2O8P2Sn","H2O8P2Sn2","H2O9S2Zr","H2OPb","H2OSn","H2OSr","H2OTl","H2OTl2","H2OU","H2OV","H2P","H2Pb","H2Pb2","H2PbPo","H2PbS","H2PbSn","H2PbTa3","H2PbTe","H2PbTi","H2PbTl3","H2PbZn","H2PbZr","H2S","H2Se","H2SeSn","H2SeTl2","H2Si2Ta","H2Si2U","H2Si2W","H2Sn","H2SnTe","H2SnU","H2SnW3","H2SnZn","H2SSn","H2Ta","H2Ti","H2Tl2Te","H2Y","H2Zr","H310BO3","H311BO3","H32Ge8Yb3","H32Mo7N6O28","H36N6O18W3","H3AlBe","H3AlBO3","H3AlCl3O12","H3AlTa","H3AsEu","H3AsGa","H3AsHgO4","H3AsNa2O5","H3AsNb","H3AsNiO4","H3AsO3","H3AsO4","H3AsTl","H3AuBr3","H3AuBr4O","H3AuCaGaPd","H3AuCl4O","H3AuGa","H3AuO3","H3AuP","H3B","H3B3Cl3N3","H3B3N3","H3B3O3","H3B3O6","H3B3S6","H3BCuNa3O12PSZn","H3Be2O","H3BeO4P","H3BF3O4P","H3Bi","H3BiO3","H3BiO4P","H3BO","H3BO2","H3BO3","H3BO4P","H3BO5W","H3BrGe","H3BrSi","H3BS3","H3CdClO5","H3Cl2HgN","H3Cl3EuO12","H3Cl3KNPt","H3Cl3NbO","H3Cl3O12Tl","H3Cl3O12Y","H3ClGe","H3ClNiO5","H3ClO2Zr","H3ClSi","H3ClSn","H3Cu2Ge","H3Eu","H3Eu2O3","H3EuN","H3EuN3O9","H3EuNO4","H3EuO3","H3EuO3V","H3EuO4P","H3EuP","H3F3OV","H3FGe","H3FSn","H3Ga","H3GaInP","H3GaLiO2","H3GaN","H3GaN3O9","H3GaNO4","H3GaO3","H3GaTh","H3GaTi","H3GaZr","H3GeI","H3GeN3","H3GeO2","H3GeO3P","H3GeSe","H3HgNO4","H3IrO3","H3ISi","H3K2O3P","H3K2O5P","H3KO3P","H3LaO4P","H3MgO5P","H3N","H3N2","H3N3NdO9","H3N3O9Tl","H3Na2O5P","H3NaO3P","H3NaO4P","H3Nb3O9","H3Nb4O9","H3NbO3","H3NbP","H3NNb","H3NO","H3NO3S","H3NO4Tl","H3NS4W","H3NTa","H3NY","H3O2SiW","H3O3PPb","H3O3Sb","H3O3Tl","H3O40PW12","H3O4P","H3O4PY","H3O4Sb","H3O4V","H3O7P2","H3O7P3PbS","H3O9P3","H3OsP","H3Pb","H3PTa","H3PW","H3Sb","H3Si","H3Sn","H3Tl","H40N10O41W12","H42Cl6N14O2Ru3","H473Ge","H48Ga8Ge6","H4AgGeO","H4AlO5S","H4As2","H4As2O7","H4Au3Ge","H4Au3NO6S2","H4Au3Sn2","H4Au4Ge","H4AuBr4KO2","H4AuBr4NaO2","H4AuCl3O2","H4AuCl4KO2","H4AuCl4N","H4AuCl4NaO2","H4AuGe","H4AuNa3O8S4","H4AuNO3S","H4B","H4B2Be","H4B2Cr","H4B2O3","H4B2O4","H4B4O7","H4B6Si","H4BaCr2O9","H4BaGe","H4BaI2O2","H4BCeMnO2W","H4Be","H4Be4O4","H4BeFN","H4BeK2O10S2","H4BeO4Si","H4BeO5S","H4BeO6S","H4BF3O2","H4BF4N","H4BiCdPbSn","H4BiInPbSn","H4BLiO4","H4BO4","H4Br4OW","H4Br6OOs","H4BrNO3","H4BrO3Tl","H4CaCl2O4","H4CaCrO6","H4CaFO5P","H4CaO6S","H4CaO8P2","H4Cd12Sn2","H4CdN2O6S2","H4CdNO4P","H4CdO2","H4CdO5S","H4CeGe","H4Cl2CuO2","H4Cl2MnO2","H4Cl2N2Pt","H4Cl2NiO2","H4Cl2O2Sn","H4Cl2O2Zr","H4Cl3GeSi","H4Cl3HgN","H4Cl3NNi","H4Cl4OW","H4Cl5NOs","H4Cl6Ir2O2","H4Cl6IrO","H4Cl6OOs","H4Cl6OPt","H4ClGa","H4ClHgO3","H4ClNO3","H4ClO3Tl","H4ClO4Tl","H4Co2Ge","H4Co3Ge","H4CoGe","H4CoI2O2","H4CoN2O7","H4CoN6Na2O12","H4CoO2","H4CoSn2","H4Cr2O5","H4Cr3Ge","H4CrGe","H4CrSn2","H4CuN2O7","H4CuO4Se","H4CuO5Se","H4ErGe","H4Eu2O2","H4EuNO8S2","H4F2Sn","H4F3NSn","H4F4NSb","H4F4OOs","H4F4OW","H4F6NNb","H4F6O20Pb9Si6","H4Fe2Ge","H4Fe3Ge","H4FeGe","H4FeN2O6S2","H4FeNaO7P2","H4FeNO8S2","H4FeO5S","H4Ga","H4Ga2S","H4Ga2Se","H4GaLi","H4GdGe","H4GdGeSi","H4Ge","H4Ge2S6","H4Ge2Te","H4GeHf3","H4GeHo","H4GeInOSn","H4GeInOW","H4GeLa","H4GeLa3","H4GeMg2","H4GeMn","H4GeMn2","H4GeMn3","H4GeMo","H4GeMo2","H4GeMo3","H4GeNb","H4GeNb3","H4GeNb5","H4GeNi","H4GeNi2","H4GeNi3","H4GeOPb","H4GeOTe","H4GeOW","H4GeOZr","H4GePd","H4GePd2","H4GePt","H4GePt2","H4GePt3","H4GePu3","H4GeRb","H4GeSb","H4GeSc","H4GeSi2","H4GeSr","H4GeTa","H4GeTa3","H4GeTb","H4GeTh2","H4GeTi","H4GeV3","H4GeW","H4GeYb2","H4GeZn","H4GeZn2","H4GeZr","H4Hg2N2O8","H4HgNO5","H4HgO2","H4I2K2NiO12","H4I2Sn","H4ILiO6","H4INaO2","H4INO","H4INO3","H4InOSn","H4IP","H4IrO2","H4K2O6Os","H4Mg2O10Si3","H4MgNO4P","H4MgO8P2","H4MgSn2","H4MnNO4","H4MnNO4P","H4MnNO7P2","H4MnO2","H4MnO5S","H4MnO8P2","H4Mo12O40Si","H4MoNa2O6","H4N","H4N2NiO6S2","H4N2O6PbS2","H4N2O6S2Sn","H4N4","H4N4O12Pu","H4N4O6Zn","H4N6Pb","H4NaO5P","H4Nb","H4NbO2","H4NbSi2","H4NbTe2","H4NiO2","H4NNb","H4NNbO2","H4NNiO4S","H4NO","H4NO3V","H4NO499Tc","H4NO4Re","H4NO5SbW","H4O2Os","H4O2OsTl","H4O2Pb2","H4O2Po","H4O2Ru","H4O2Ta","H4O2Tc","H4O2U","H4O2V","H4O2W","H4O2Zn","H4O3PSe","H4O40SiW12","H4O4Os","H4O4Pb","H4O4Pb2Si","H4O4Si","H4O4SiZn2","H4O4Sn","H4O4SnW","H4O4SZn","H4O4W","H4O4Zr","H4O5PbSn","H4O5SZr","H4O5W","H4O6P299Tc","H4O6SU","H4O7P2","H4O7P299Tc","H4O8PbSSi","H4OPb","H4P2","H4Pb","H4Pb2Pd3","H4PbSn","H4ReSi2","H4ReTe2","H4Si2Ta","H4SiTe","H4Sn","H4Sn2U","H4SSi","H4TaTe2","H5B3","H5Be5O5","H5BrN2","H5BSi","H5Cl5NbO","H5CrO5P","H5F3N2Sn","H5F4O3U","H5F5NbO","H5FeN3O10","H5FeO5P","H5Ga3","H5GaNiO5","H5GaO","H5Ge3K3O10","H5Ge3Na3O10","H5Ge5NbO10","H5IO6","H5KNbO3","H5KO3Ta","H5KOPTiW","H5LiO3Ta","H5Mo12O41P","H5N2O6S2","H5NaOPW","H5Nb","H5Nb5O15","H5NbO3","H5NbO5","H5NNaO4P","H5NO2W","H5NO3S2","H5NO5S","H5NOSi2","H5NS4W","H5O10P3","H5O3PPb","H5O5P","H5O5Ta","H5OPW","H5Ta","H60AlCaKNaO36Si2","H60B5N15O15","H6AgN3O3","H6Al2Au3","H6Al2Nb3","H6As2O8","H6AsGaInP","H6Au2Te3","H6AuCl3O3","H6AuCl4NO","H6AuO3","H6B","H6B2","H6B3N3","H6BaO3Zr","H6Be6O6","H6BeN2O9","H6BeNO6","H6BiGeO","H6BLi","H6BN","H6Br2N2Pt","H6Br2NiO3","H6Ca3Cl4O6","H6CeSn3","H6Cl2Ge2","H6Cl2HgO11","H6Cl2N2","H6Cl2N2Pt","H6Cl3IrN3","H6Cl3IrO3","H6Cl3O3Os","H6Cl4O3Sn","H6ClNaO5","H6CoSn3","H6CrO4Pb","H6CuGaInSe","H6CuGeSe","H6Eu2O3","H6EuN3","H6EuN3O9","H6EuO3V","H6EuO3Y2","H6EuO6Y","H6EuPb3","H6EuSn3","H6F2Ge2","H6F3GaO3","H6FeO3Ti","H6FeO6P3","H6Ga","H6GaN3O12","H6Ge2","H6Ge3","H6Ge3O3","H6Ge5","H6Ge6KNbO12","H6GeI2","H6GeN2","H6GeSi","H6GeSi2","H6GeSn","H6GeTe","H6HgN4O6","H6I2N2Pt","H6ILiO3","H6InN3O9S3","H6IrO3","H6K2O4Os","H6K2O6Pt","H6K2O6Sn","H6KO3Ta","H6KO6Sb","H6LiNbO6","H6Mo12O41Si","H6MoO3","H6N2O6PbS2","H6N3Nb","H6N3O12Tl","H6N3Y","H6N4O4Pt","H6Na2O6Pb","H6Na2O6Pt","H6Na2O6Sn","H6NbSi2","H6NbSn","H6NbSn3","H6Ni2S3","H6NiO3","H6NNbO2","H6NO4Ru","H6NO6Tl","H6O13P4","H6O2Sn","H6O3Os","H6O3Pb3","H6O3Re","H6O3Sn3","H6O3Ta3","H6O3Tl2","H6O3U","H6O3W","H6O41SiW12","H6O5PbS","H6O6SnZn","H6O6Te","H6O7Si2","H6OPb2","H6SeSi2","H6Si2","H6Si2Ta","H6Si3","H6Sn2","H6Sn3Ti2","H76EuK13O108Si2W22","H7AuCl4O3","H7ClGe2","H7F7","H7Ge2I","H7GeSi","H7InO7Sn","H7MgO7P","H7Nb5Si3","H7NbSi2","H7O2PW","H7O4ReTl","H7Si3Ta5","H85BK6O41VW11","H8Al2BeO4","H8B10","H8B2Be","H8BaGe2","H8BeCl2O12","H8BeCl2O4","H8BeCl2O8","H8BeClO4","H8BeF4N2","H8BeN2O10","H8BeNO7","H8BeO8S","H8BeO8Se","H8BNaO7","H8BNaO8","H8Br2CdO4","H8Br2MnO4","H8Br3IrO4","H8Br4Ge","H8Br6IrN2","H8Br6N2Os","H8CdF6Si","H8CdN2O10","H8Ce5Sn4","H8CeGe2","H8Cl2MnO4","H8Cl2NiO4","H8Cl2O6Pb","H8Cl2O8Pb","H8Cl3O4Tl","H8Cl4HgN2","H8Cl4N2Ni","H8Cl4N2Pd","H8Cl4N2Zn","H8Cl6IrN2","H8Cl6N2Os","H8Cl6N2Pd","H8Cl6N2Pt","H8Cl6N2Sn","H8ClHgO8","H8CoGe2","H8Cu3O9P2","H8CuGe2","H8ErGe2","H8EuN5O15","H8EuN7O15","H8EuO4W","H8F2NiO4","H8F5N2Rh","H8F6GeN2","H8F6N2Zr","H8F6SiTl2","H8F7N2Ta","H8FeGe2","H8FeN2O8S2","H8GdGe2","H8GdGeSi","H8GdO4Ta","H8Ge2","H8Ge2Hf","H8Ge2La","H8Ge2Mo","H8Ge2Nb","H8Ge2Nb3","H8Ge2Ni5","H8Ge2Pr","H8Ge2Pt","H8Ge2Re","H8Ge2Sm","H8Ge2Ta","H8Ge2Tb","H8Ge2U","H8Ge2V3","H8Ge2Zn","H8Ge2Zr","H8Ge3","H8Ge3O2","H8Ge3S2","H8Ge4","H8GeI4","H8GeMg2","H8GeO2","H8GeSe2","H8HgI2O6","H8HgSn4","H8Ho5Sn4","H8I2MnO4","H8IrSn4","H8Mg2O10Si3","H8Mn3O9P2","H8Mn7Sn4","H8MnN2O10","H8MnO8S","H8Mo2N2O7","H8MoN2O4","H8MoN2S4","H8N2NiO8S2","H8N2O4Te","H8N2O4W","H8N2O7U2","H8N2O8S2","H8N2O8S2Zn2","H8N2S4W","H8N4O12S4Sn","H8Na6O40W12","H8NbO4","H8Ni3O9P2","H8O4Os","H8O4Sn4","H8O6Pt","H8SnTe","H94NiO47Ti20W2","H9Al3Y5","H9AuCl4O4","H9B3O9Zn2","H9Bi5N4O22","H9BNaO6","H9Cl3IrN3","H9Cl5N2OOs","H9GaSn3","H9Ge3N","H9InO8Sn","H9N2O3P","H9NOPW","H9NSi3","HAg","HAgNO2","HAgNO3","HAlCl2","HAlNa2O5P","HAlO5S","HAs3O13Pb5","HAsHgO4","HAsKO2","HAsO3Pb","HAsO4","HAsO4Pb","HAsO4Sn","HAsSn","HAt","HAuBr4","HAuCl","HAuCl4","HAuO2","HB","HBaO4P","HBBeO2","HBBr2","HBBrCl","HBCl2","HBe","HBe2F2O","HBeBrO3","HBeO","HBeO3P","HBeO4P","HBF2","HBF2O","HBF3KO","HBF3O","HBF4","HBF4NO2","HBI2","HBiCrO5","HBLiO2","HBNi2","HBO2","HBO3","HBO3Zn","HBO4W","HBr","HBr3Ge","HBr3GeRb","HBrO","HBrO3Re","HBrOPb","HBrRa","HBrSn","HCdO4P","HCl","HCl3CsGe","HCl3CsPb","HCl3Ge","HCl3PbRb","HCl3Sn","HClEuO","HClHgO4","HClHgO5","HClO","HClO2Re","HClO2Zr","HClO3Tl","HClOPb","HClRa","HClSn","HCN","HCO","HCoO2","HCrO","HCrO5S","HCu2S","HDS","He","HeHg","HeMg","HeN2O2","HeNe","HeO2","HeTa","HEu2S","HEuNbO2","HEuNO3","HEuSi2","HeYb","HF","HF2Na","HF2O2P","HF2P","Hf2Rh","HF3Si","HF6O2Sb","HF6O3SSb","HF6Sb","HFeO2","HFGaO","HFHgO","HfI4","HfIr3","HFNbO2","HfO2","HfO3Pb","HfO4Ti","HfO5Y2","HfO8S2","HFOPb","HFPb","HfRe2","HfRh","HfS2","Hg","Hg2","Hg2I2","Hg2N2O6","Hg2N6","Hg2O","Hg2O4S","Hg2O8S2","Hg2Pd","Hg2Pt","Hg2Tl","Hg3O6S","Hg3O8P2","Hg3Tl","Hg4Pt","Hg5Tl2","HGa","HGaN","HGaNO3","HGaO2","HGaSe","HGaTe","HGeO3P","HgI","HgI2","HgI2O6","HgI3","HgI3K","HgI4","HgI4K2","HgIK","HgIn","HgIn6","HgMg","HgMg2","HgMg3","HgMn","HgN2O2S2","HgN2O6","HgN2O6Tl","HgN2O8","HgN6","HgNa","HgNe","HgNi","HgNO3","HgO","HgO3Se","HgO4S","HgPb","HgPb2","HgPd","HgPo","HgPt","HgS","HgSe","HgTe","HgTi3","HgTl","HHe","HHgNO3","HI","HI2KO6","HIK2O5","HIN3","HIO","HIO2","HIO3","HIO3Tl","HIO4","HISn","HKNO3Os","HKO3S2","HKO4S","HLi","HMgO3Si","HMgO4P","HMnO4","HMnO4P","HMoNbO6","HMoO2P","HN2O","HN2O4","HN3O5","HNa2O","HNaO3Se","HNaO4S","HNaO6PW","HNb","HNbO2","HNbO3","HNbO5P","HNbO8P2","HNbSi2","HNi2P","HNiO4P","HNiSe","HNNb","HNO","HNO3","HNO3Tl","HNO3Y","HNO4Pb","HNO6P2Tc","HO","HO2","Ho2O12S3","Ho2O3","Ho2S3","HO2Sb","HO3PPb","HO3PSn","Ho3Rh2","HO3STl","HO3Ta","HO3U","HO3V","HO3W","HO4PPb","HO4Re","HO4S","HO4STl","HO4W","HO5PPb3","HO5S","HO6PU","HoI3","HoRh2","HOTl","HPbSb","HPbTe","HPO","HSi2Ta","HSO","HSSb","I","I2","I2Mg","I2MgO6","I2Mn","I2Mo","I2Ni","I2O5","I2O6Pb","I2O6Sr","I2O6Zn","I2Os","I2P4S3","I2Pb","I2Pd","I2Pt","I2Rh","I2S2","I2Sm","I2Sn","I2Sr","I2Te","I2Ti","I2Tl","I2Tm","I2V","I2Y","I2Yb","I2Zn","I3","I3In","I3Ir","I3K","I3La","I3Lu","I3N","I3Nb","I3Nd","I3O9Y","I3P","I3Pr","I3Re","I3Rh","I3Ru","I3Sb","I3Sc","I3Si","I3Sm","I3Tb","I3Tl","I3Tl3","I3Tm","I3U","I3V","I3Y","I3Yb","I4Ir","I4MoS","I4P2","I4Pb","I4Pt","I4Si","I4Sn","I4Te","I4Ti","I4U","I4Zr","I5Nb","I5Ta","I6K2Pt","I6K2Re","I6OsZn","I6TeTl2","IIn","IK","IK2NPS2VY","IKO3","IKO4","ILi","ILiO3","ILiO4","In2O12S3","In2O5Sn","In2S3","IN3","In3Y","INa","INaO3","INaO4","InIrMoOSn","InIrOSn","InNb3","InOPdSn","InOSn","InOTiW","InS","InSb","IO3","IO3Rb","IO3Tl","IO4","IOSb","IOsZn","Ir","Ir2La","Ir2La3","Ir2Lu","Ir2Mg","Ir2Nb","Ir2Nd","Ir2O12S3","Ir2O3","Ir2Pu","Ir2Y","Ir3La","Ir3La7","Ir3Mo","Ir3Nb","Ir3Ni","Ir3Pu5","Ir3Ti","Ir3V","Ir3Y","Ir4Y","Ir5La","Ir5Th","Ir7La2","IRb","IRh","IrK3N6O12","IrLa3","IrLa4","IrMn","IrMn3","IrMo3","IrN3O9","IrN6Na3O12","IrNb","IrNb3","IrNi","IrNi3","IrO2","IrOPb","IrOPd","IrOPdSn","IrOPt","IrORh","IrORu","IrORuSn","IrSc","IrTa","IrTh","IrTi","IrTi3","IrU","IrV","IrZr","ISSb","ITl","K","K10Y","K2Mg2O12S3","K2MnO4","K2MnO8S2","K2MoO4","K2N2O8PdS","K2N4O8Pt","K2NiO8S2","K2NO7S2","K2O10S2235U","K2O10S2U","K2O12S3Sn2","K2O17Ti8","K2O3S2","K2O3Si","K2O3Sn","K2O3SSe","K2O3Ti","K2O4Os","K2O4Ru","K2O4S","K2O4S2","K2O4Se","K2O4W","K2O5S2","K2O6S3","K2O6S4","K2O6S5","K2O7S2","K2O8S2","K2O8S2Sn","K2O8S2Zn","K2S4","K3LaO8P2","K3Li2Nb5O15","K3N6O12Rh","K3O4P","K3O4Sb","K3O4V","K3S4Sb","K5O10P3","KCl","KClO","KCN","KCO","KCrO","KF","KHCO","KHPO","KI","KLiO4S","KMnO4","KN4O8Rh","KNaNb2O6","KNaO4S","KNb5O15Sr2","KNbO3","KNbO4Pb","KNO2","KNO3","KNO3Os","KO","KO2","KO2Sb","KO3S","KO3Ta","KO3V","KO4Os","KO4Re","KO4Ru","KO5PTi","KOH","Kr","KS","KSO","La2O12S3","La2O7Ti2","La2O9W2","La2S3","La2S4Sr","La2Tl","La3Tl","La3Tl5","La4Ni","La4O3S3","La5Tl3","LaNi","LaNi5","LaO4P","LaOPb","LaTl","LaTl3","Li2MnO3","Li2MoO4","Li2O3S2","Li2O3Ti","Li2O3Zr","Li2O4S2","Li2O4Ti","Li2O4W","Li4O4Ti","LiBr","LiCl","LiI","LiMn2O4","LiNbO","LiNbO3","LiNiO2","LiO","LiO3Ta","LiOH","LiPO","Lu2O3","Lu2S3","LuY","Mg","Mg2Nb2O7","Mg2O4Si","Mg2O4Ti","Mg2O7P2","Mg2O7Ta2","Mg2O8Si3","Mg2Si","Mg2Y","Mg3O8P2","Mg3P2","Mg3Y","MgB2","MgCl","MgCO","MgI","MgMn2O8","MgMoO4","MgN","MgNb2O6","MgNb2O9Pb3","MgNO","MgO","MgO2","MgO3S","MgO3S2","MgO3Sn","MgO3Ti","MgO3Zr","MgO4P2","MgO4S","MgO4W","MgO5S2","MgO6S2","MgO6Ta2","MgPO","MgS","MgS4Sc2","MgSO","MgTl","MgY","Mn","Mn2Nb","Mn2Nb2O7","Mn2O12S3","Mn2O3","Mn2O7P2","Mn2O8Zn","Mn2Sb","Mn2Ti","Mn2Y","Mn3O4","Mn3O8P2","MnMoNiS","MnMoO4","MnN2O6","MnNaO4","MnO","MnO2","MnO3Se","MnO3Si","MnO3Sn","MnO3Te","MnO3Ti","MnO3Zr","MnO4","MnO4P","MnO4P2","MnO4Rb","MnO4S","MnO4W","MnOPtSn","MnOSn","MnP","MnS","MnSe","MnSe2","MnTe","MnTe2","MnTi","MnY","Mo2","Mo2O6","Mo7O24","MoN","MoNa2O4","MoNb","MoNiO4","MoO","MoO12S3","MoO2","MoO2S","MoO3","MoO3Sr","MoO4","MoO4Pb","MoO4Sr","MoO4Zn","MoOPb","MoS","MoS2","MoS3","MoS4","MoSe2","MoTa","MoTe2","MoW","N","N12Pb","N2","N2Na2O5S","N2NiO4","N2NiO6","N2O2S2Te","N2O2S3","N2O3","N2O4Pb","N2O5S","N2O6Pb","N2O6Pt","N2O6Ra","N2O8U","N2S","N2Ta2","N2W3","N2Y","N3O12RuS3","N3O9Rh","N3O9Ru","N3O9Sb","N3O9Tl","N3O9Tl3","N3O9Y","N3O9Yb","N3S3","N3Tl","N4O10Ru","N4O12Pb","N4O12Po","N4O12Po2","N4O12Ti","N4S","N5Ta3","N6O18W","N6O2S","N6Pb","N6S5","Na","Na2NbO4P","Na2O2S2","Na2O3Pb","Na2O3S","Na2O3Se","Na2O3Sn","Na2O3Ti","Na2O433S","Na2O434S","Na2O435S","Na2O4S","Na2O4Ti","Na2O4U","Na2O4W","Na2O5S2","Na2O5Si2","Na2O6S2","Na2O6S4","Na2O7Ti3","Na2O8S2","Na2O9S2Zr","Na2S","Na2S4","Na3O3PS","Na3O40PW12","Na3O4P","Na3O4Sb","Na3O4V","Na3P","Na3S4Sb","Na4O4Ti","Na4O6P2","Na4O7P2","Na4O7PW","Na5O10P3","Na6O13P4","Na6O39W12","Na6O7Si2","NaBr","NaCHO","NaCl","NaClO","NaCN","NaCO","NaCrO","NaF","NaHCO","NaI","NaN","NaNbO3","NaNbS2","NaNO","NaO","NaO2","NaO3Sb","NaO3STl","NaO3Ta","NaO3V","NaO499Tc","NaO4Re","NaO4Rh","NaO4S","NaO4Tc","NaOH","NaPO","NaSO","Nb","Nb2","Nb2Ni3","Nb2O3","Nb2O5","Nb2O6Pb","Nb2O6Zn","Nb2O7Sr2","Nb2O9Si3","Nb2S3","Nb3O20P5","Nb3Pb","Nb3Pt","Nb3Rh7","Nb3Sb","Nb3Tl","Nb3Zr","Nb4","Nb4O10","Nb4O9","Nb5Ni","Nb5O15","Nb6Ni7","Nb7Ni6","NbNi","NbNi2","NbNi3","NbNiO4Ti","NbO","NbO2","NbO3","NbO3Rb","NbO3Tl","NbO4P","NbO4TiZn","NbOPbW","NbOSn","NbOTiW","NbOTlW","NbOW","NbP","NbPd","NbPd3","NbPt","NbRh3","NbS","NbS2","NbS3","NbSb2","NbSe2","NbSe3","NbSi","NbSi2","NbSSn","NbTa","NbTe2","NbTi","NbTi4","NbV2","NbZn3","NbZr","Nd2O12S3","Nd2O3","Nd2O7Ti2","Nd2O9Ti3","Nd3Tl5","Nd4O16Ti5","NdTl3","NdY","NH","NHBr","NHCl","NHHCO","NHI","NHNO","NHOH","Ni","Ni14Ti11","Ni2O3","Ni2O4Si","Ni2O7P2","Ni2S2","Ni2Si","Ni2Y","Ni2Y3","Ni3O8P2","Ni3P2","Ni3Ru","Ni3S2","Ni3Sb","Ni3Y","Ni4Ti3","Ni5Y","Ni8Y","NiO","NiO10U3","NiO2","NiO3S","NiO3Se","NiO3Si","NiO3Te","NiO3Ti","NiO3Zr","NiO4P2","NiO4PbSi","NiO4S","NiO4Se","NiO4Te","NiO4W","NiOSn","NiPd3","NiS","NiS2","NiSb","NiSe","NiSi","NiSW","NiTe","NiTi","NiV","NiY","NiY2","NiY3","NiZr","NiZr2","NNb","NO","NO2","NO3","NO3Os","NO3Tl","NO3Y","NOs","NS","NTa","NTi","NU","NV","NY","O","O11Pr6","O12Rh2S3","O12S3Sb2","O12S3Sm2","O12S3Tb2","O12S3Ti2","O12S3Tl2","O12S3V2","O12S3V3","O12S3Y2","O12Si3Y4","O12U4","O12W3Y2","O14S4Sn","O16P4Pb3","O16P4Ti3","O16Sb4Sn3","O16Si4Y3","O2","O20P4Ti5","O2233U","O234S","O2P","O2Pb","O2Pb2","O2Po","O2Pt","O2Re","O2Rh","O2S","O2S2","O2Sn","O2Ta","O2Tc","O2Te","O2Ti","O2U","O2V","O2W","O2Y2Zr","O2Zr","O390Y2","O3P2","O3PbS","O3PbS2","O3PbSe","O3PbSi","O3PbSn","O3PbTe","O3PbTi","O3PbZr","O3RbTa","O3Re","O3Rh2","O3S","O3S2","O3S2Sr","O3S2Zn","O3S3Sb4","O3S3Y4","O3Sb","O3Sb2","O3Se","O3SeSn","O3SeTl2","O3SeZn","O3SiTi","O3Sm2","O3Sn","O3SnSr","O3SnZn","O3SrTi","O3SrW","O3STl2","O3SZn","O3Ta","O3Tb2","O3Ti","O3Ti2","O3TiZn","O3Tl2","O3Tm2","O3U","O3V","O3W","O3Y2","O3Y2Zr","O3Yb2","O4Os","O4P","O4P2Pb","O4P2S4Zn3","O4Pb2Si","O4Pb3","O4PbS","O4PbSe","O4PbTe","O4PbW","O4PdS","O4PRh","O4PSb","O4PTi","O4PTl3","O4PtS","O4PY","O4RaS","O4Rb2S","O4Rb2W","O4Re","O4ReTl","O4Ru","O4RuS","O4S","O4S2","O4S2Zn","O4Sb","O4SeTl2","O4SiTi","O4SiZr","O4Sr2Ti","O4SrW","O4SSn","O4SSr","O4STi","O4STl","O4STl2","O4SU","O4SV","O4SZn","O4SZr","O4Ti2","O4TiZr","O4U","O4V","O4VY","O4W","O4WZn","O5Pb2S","O5PbSi2","O5PbTiZr","O5S","O5S2","O5Sb2","O5Sb2Sn","O5STi","O5SV","O5SZr","O5Ta2","O5Ti3","O5V2","O5WZr","O5Y2Zr","O6PbTa2","O6PbV2","O6PtS2","O6S2","O6S3","O6S4","O6Sb4","O6Si2Ti","O6Si2Y2","O6SU","O7P299Tc","O7P2Pb2","O7P2Sn","O7P2Sn2","O7P2Zn2","O7P4","O7Pb2SSi","O7Re2","O7Sr2Ta2","O7Ti3","O7Y2Zr2","O8P2Rh3","O8P2Sn3","O8P2Sr3","O8P2Zn","O8P4","O8Pb3Sb2","O8PbS2","O8PtS2","O8S2","O8S2Sn","O8S2SnTl2","O8S2Ti","O8S2Tl2","O8S2Zr","O8W2Zr","O99Tc","O9Se3Tl2","O9Si390Y2","O9Si3Y2","O9V3Y","O9W3","O9Y2Zn3","OH","OOs","OPb","OPdRuSn","OPdSn","OPo","OPt","OPtSn","ORb","ORbTaW","ORhSn","ORuSn","OS","OS2","OS8","OSn","OsS","OSU","OsW","OTa","OTb","OTc","OTi","OTl2","OTlW","OV","OW","OWY","OY2","OYb","OZn","OZr","P4S3","P4S5","P4S8","P4S9","Pb","PbI","PbO","PbPo","PbS","PbS2","PbSb","PbSe","PbTl3","PCl","Pd3Y","PdRh","PdS","PdY","PmTl3","PO","PoSc","PoTi","PoTi2","PoTm","PoZn","Pr3Tl","PrTl3","PSb","PSe","Pt2Ti","Pt3Y","PTa","PTi","PtRh","PtRu","PtS","PtS2","Ra","RbTl","Re2S7","ReBe22","ReS2","ReSe2","ReSi2","ReTe2","ReW","Rh","Rh2Te","Rh2Y","Rh3Y7","RhS","Ru2Y5","RuS2","RuSW","RuY3","S","S10Sb4","S2","S2Se","S2Sn","S2Ta","S2Te","S2Ti","S2U","S2V","S2W","S2Zr","S3","S3Sb2","S3Sm2","S3Ti","S3Tl2","S3Tm2","S3V2","S3W","S3Yb2","S4","S4Sb2","S4Se4","S5Sb2","S5V2","S6","S6Sb4","S6Se2","S7","S7Se","S8","S899Tc","Sb","Sb2Se3","Sb2Te3","Sb2Tl7","Sb3Y5","SbSm","SbTl","SbY","SbZn","SbZr","Se2Sn","Se2Ta","Se2Ti","Se2U","Se2V","Se2W","Se2Zr","Se3Tl","Se3Tl2","Se3Y2","Se6","SeSn","SeTl","SeTl2","SeW","Si2Ta","Si2Ti","Si2U","Si2W","Si2Zr","Si3Ta5","SiO","SmTl3","Sn","Sn9Tl","SnTe","SO","SrCl","SrTl2","SSb","SSn","STl","STl2","SV","SZn","Ta3Ti7","TaTe2","TaW","TbTl3","Te5","Te6","ThBeH8","ThTl","Ti","TiTe2","TiW","TiZn","Tl","Tl2","Tl2Te","Tl3Yb","TlTe","TlV3","U","UTe2","V2Y","V3Y","VTe2","W","Y2","Y2Zn3","Y2Zr","YZn","YZn5","ZnCl","ZnCO","ZnI","ZnS","ZnSO","Zr"];
+
+function fuzzySearch(query, list) { query = query.toLowerCase().trim(); if (!query) return list.slice(0, 80); return list.map(item => { const lower = item.toLowerCase(); const score = lower.includes(query) ? 100 : lower.split('').filter((c) => query.includes(c)).length * 2; return {item, score}; }).filter(x => x.score > 10).sort((a,b) => b.score - a.score).map(x => x.item).slice(0, 120); }
+function setupMoleculeSearch() { const input = document.getElementById('mol-search'); const resultsDiv = document.getElementById('mol-results'); if (!input || !resultsDiv) return; input.addEventListener('input', () => { const matches = fuzzySearch(input.value, moleculeList); let html = ''; matches.forEach(mol => { html += `<div onclick="selectMolecule('${mol}')" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #222;">${mol}</div>`; }); resultsDiv.innerHTML = html || '<div style="padding:10px;color:#888;">No matches</div>'; resultsDiv.style.display = 'block'; }); document.addEventListener('click', e => { if (!input.contains(e.target) && !resultsDiv.contains(e.target)) resultsDiv.style.display = 'none'; }); }
+function selectMolecule(mol) { document.getElementById('mol-input').value = mol; document.getElementById('mol-results').style.display = 'none'; buildMolecule(); }
+function quickLoad(mol) { document.getElementById('mol-input').value = mol; buildMolecule(); }
+function slotCount(v) { return Array.isArray(v) ? v.length : (v || 0); }
+function getSlotColor(sz) { return sz <= 0 ? CFG.Stack.Colors[0] : sz >= CFG.Stack.Colors.length ? CFG.Stack.Colors[CFG.Stack.Colors.length - 1] : CFG.Stack.Colors[sz]; }
+function hookState(arr) { return arr.length === 0 ? 'none' : arr.length % 2 === 1 ? 'OUT' : 'IN'; }
+function formatChargeFlowStrength(s) { return s + '/100'; }
+
+function generateElements() {
+    var e = [], seq = [{z:1,add:'core',name:'H'},{z:2,add:'core',name:'He'},{z:3,add:'core',name:'Li'},{z:4,add:'core',name:'Be'},{z:5,add:'core',name:'B'},{z:6,add:'pn',name:'C'},{z:7,add:'ce',name:'N'},{z:8,add:'cw',name:'O'},{z:9,add:'cf',name:'F'},{z:10,add:'cb',name:'Ne'},{z:11,add:'pn',name:'Na'},{z:12,add:'ps',name:'Mg'},{z:13,add:'ce',name:'Al'},{z:14,add:'cw',name:'Si'},{z:15,add:'cf',name:'P'},{z:16,add:'cb',name:'S'},{z:17,add:'capS',name:'Cl'},{z:18,add:'capN',name:'Ar'},{z:19,add:'ctr',name:'K'},{z:20,add:'ctr',name:'Ca'},{z:21,add:'ce',name:'Sc'},{z:22,add:'cw',name:'Ti'},{z:23,add:'cf',name:'V'},{z:24,add:'cb',name:'Cr'},{z:25,add:'ce',name:'Mn'},{z:26,add:'cw',name:'Fe'},{z:27,add:'cf',name:'Co'},{z:28,add:'cb',name:'Ni'},{z:29,add:'ctr',name:'Cu'},{z:30,add:'ctr',name:'Zn'},{z:31,add:'pn',name:'Ga'},{z:32,add:'ps',name:'Ge'},{z:33,add:'capS',name:'As'},{z:34,add:'capN',name:'Se'},{z:35,add:'capS',name:'Br'},{z:36,add:'capN',name:'Kr'},{z:37,add:'core',name:'Rb'},{z:38,add:'core',name:'Sr'},{z:39,add:'ce',name:'Y'},{z:40,add:'cw',name:'Zr'},{z:41,add:'cf',name:'Nb'},{z:42,add:'cb',name:'Mo'},{z:43,add:'ce',name:'Tc'},{z:44,add:'cw',name:'Ru'},{z:45,add:'cf',name:'Rh'},{z:46,add:'cb',name:'Pd'},{z:47,add:'ctr',name:'Ag'},{z:48,add:'ctr',name:'Cd'},{z:49,add:'pn',name:'In'},{z:50,add:'ps',name:'Sn'},{z:51,add:'capS',name:'Sb'},{z:52,add:'capN',name:'Te'},{z:53,add:'capS',name:'I'},{z:54,add:'capN',name:'Xe'},{z:55,add:'core',name:'Cs'},{z:56,add:'core',name:'Ba'},{z:57,add:'ce',name:'La'},{z:58,add:'cw',name:'Ce'},{z:59,add:'cf',name:'Pr'},{z:60,add:'cb',name:'Nd'},{z:61,add:'ce',name:'Pm'},{z:62,add:'cw',name:'Sm'},{z:63,add:'cf',name:'Eu'},{z:64,add:'cb',name:'Gd'},{z:65,add:'pn',name:'Tb'},{z:66,add:'ps',name:'Dy'},{z:67,add:'capS',name:'Ho'},{z:68,add:'capN',name:'Er'},{z:69,add:'capS',name:'Tm'},{z:70,add:'capN',name:'Yb'},{z:71,add:'ce',name:'Lu'},{z:72,add:'cw',name:'Hf'},{z:73,add:'cf',name:'Ta'},{z:74,add:'cb',name:'W'},{z:75,add:'ce',name:'Re'},{z:76,add:'cw',name:'Os'},{z:77,add:'cf',name:'Ir'},{z:78,add:'cb',name:'Pt'},{z:79,add:'ctr',name:'Au'},{z:80,add:'ctr',name:'Hg'},{z:81,add:'pn',name:'Tl'},{z:82,add:'ps',name:'Pb'},{z:83,add:'capS',name:'Bi'},{z:84,add:'capN',name:'Po'},{z:85,add:'capS',name:'At'},{z:86,add:'capN',name:'Rn'},{z:87,add:'core',name:'Fr'},{z:88,add:'core',name:'Ra'},{z:89,add:'ce',name:'Ac'},{z:90,add:'cw',name:'Th'},{z:91,add:'cf',name:'Pa'},{z:92,add:'cb',name:'U'},{z:93,add:'ce',name:'Np'},{z:94,add:'cw',name:'Pu'},{z:95,add:'cf',name:'Am'},{z:96,add:'cb',name:'Cm'},{z:97,add:'ctr',name:'Bk'},{z:98,add:'ctr',name:'Cf'}];
+    var sl = { core:[], pn:[], ps:[], ce:[], cw:[], cf:[], cb:[], capN:[], capS:[], ctr:[] };
+    for (var i = 0; i < seq.length; i++) { 
+        var step = seq[i]; 
+        sl[step.add].push(1); 
+        
+        // Mathis Layout Override for Carbon (Z=6)
+        if (step.z === 6) {
+            sl = { core: [1,1,1,1], pn: [1], ps: [1], ce: [], cw: [], cf: [], cb: [], capN: [], capS: [], ctr: [] };
+        }
+        
+        // Mathis Layout Override for Oxygen (Z=8)
+        // Places single L1 Disc slots N/S on top and underneath the 6 proton core
+        if (step.z === 8) {
+            sl = { core: [1,1,1,1,1,1], pn: [1], ps: [1], ce: [], cw: [], cf: [], cb: [], capN: [], capS: [], ctr: [] };
+        }
+        
+        var es = JSON.parse(JSON.stringify(sl)); 
+        var dr = { 
+            N: { size: es.pn.length, spin: es.pn.length%2!==0?'+':'-', hook: es.pn.length>0?'OUT':'none', capSeal: es.capN.length>0 }, 
+            S: { size: es.ps.length, spin: es.ps.length%2!==0?'+':'-', hook: es.ps.length>0?'IN':'none', capSeal: es.capS.length>0 }, 
+            E: { size: es.ce.length, spin: es.ce.length%2!==0?'+':'-', hook: hookState(es.ce), capSeal: false }, 
+            W: { size: es.cw.length, spin: es.cw.length%2!==0?'+':'-', hook: hookState(es.cw), capSeal: false }, 
+            F: { size: es.cf.length, spin: es.cf.length%2!==0?'+':'-', hook: hookState(es.cf), capSeal: false }, 
+            B: { size: es.cb.length, spin: es.cb.length%2!==0?'+':'-', hook: hookState(es.cb), capSeal: false } 
+        }; 
+        var dirs = MathisQ.computeProfile(es, dr); 
+        var ch = { nEm: dirs.N.em, sIn: dirs.S.intake, eEm: dirs.E.em, wEm: dirs.W.em, fEm: dirs.F.em, bEm: dirs.B.em }; 
+        e[step.z] = { name: step.name, slots: es, charge: ch, dirs: dirs, thruCh: MathisQ.throughCharge(es, dirs), eqNet: MathisQ.equatorialNet(es, dr), recyc: MathisQ.chargeRecycling(es), angV: MathisQ.carouselAngVel(es, dirs), effR: MathisQ.effectiveRadius(es), desc: step.name + ' (Z=' + step.z + ')' }; 
+    }
+    return e;
+}
+
+var ELEMENTS = generateElements(); 
+var SYMBOL_TO_Z = {}; 
+for (var zi = 1; zi <= 98; zi++) { if (ELEMENTS[zi]) SYMBOL_TO_Z[ELEMENTS[zi].name] = zi; } 
+var DIR_VECTORS = { N:new THREE.Vector3(0,1,0), S:new THREE.Vector3(0,-1,0), E:new THREE.Vector3(1,0,0), W:new THREE.Vector3(-1,0,0), F:new THREE.Vector3(0,0,1), B:new THREE.Vector3(0,0,-1) };
+
+function analyzeMBN(zA, zB) { 
+    var atomA = ELEMENTS[zA], atomB = ELEMENTS[zB]; 
+    if (!atomA || !atomB) return []; 
+    var dirOrder = ['N', 'S', 'E', 'W', 'F', 'B'], results = []; 
+    dirOrder.forEach(function(dirA) { 
+        var slotA = atomA.dirs[dirA]; 
+        if (!slotA) return; 
+        dirOrder.forEach(function(dirB) { 
+            var slotB = atomB.dirs[dirB]; 
+            if (!slotB) return; 
+            var strength = MathisQ.bondStrength(slotA, slotB); 
+            results.push({ 
+                dirA: dirA, dirB: dirB, slotA: slotA, slotB: slotB, bondType: 'MBN', 
+                bondStatus: strength >= 70 ? 'valid' : strength >= 40 ? 'weak' : strength >= 20 ? 'slip' : 'invalid', 
+                prefix: '', strength: strength, mbnStr: dirA + '>' + dirB 
+            }); 
+        }); 
+    }); 
+    return results; 
+}
+function findBestBond(zA, zB, occupiedDirsA, occupiedDirsB) { 
+    var blockedA = occupiedDirsA instanceof Set ? occupiedDirsA : new Set(occupiedDirsA || []); 
+    var blockedB = occupiedDirsB instanceof Set ? occupiedDirsB : new Set(occupiedDirsB || []); 
+    var candidates = analyzeMBN(zA, zB).filter(function(c) { return !blockedA.has(c.dirA) && !blockedB.has(c.dirB); }); 
+    if (!candidates.length) return null; 
+    var statusRank = function(s) { return s === 'valid' ? 3 : s === 'weak' ? 2 : s === 'slip' ? 1 : 0; }; 
+    candidates.sort(function(a, b) { return (b.strength - a.strength) || (statusRank(b.bondStatus) - statusRank(a.bondStatus)); }); 
+    return candidates[0]; 
+}
+
+var scene, camera, renderer, orbitCtrl, currentAtomGroup = null, currentMolGroup = null, electronGroup = null;
+var allChargeStreams = [], allLabels = [], allArrows = [], allPressureZones = [], allMBNTags = [], allSpinArrows = [];
+var clock = new THREE.Clock(), currentZ = 1; var currentMolAtoms = [], atomIdCounter = 1; var savedBaseId = '', savedTargetZ = ''; var selectedElementDetailsVisible = false;
+
+function frameObject(obj) {
+    if (!obj) return;
+    var box = new THREE.Box3().setFromObject(obj);
+    if (box.isEmpty()) return;
+    var center = box.getCenter(new THREE.Vector3());
+    var size = box.getSize(new THREE.Vector3());
+    var maxDim = Math.max(size.x, size.y, size.z);
+    var fov = camera.fov * (Math.PI / 180);
+    var distance = Math.max(30, Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.8); 
+    
+    orbitCtrl.target.copy(center);
+    
+    var dir = new THREE.Vector3().subVectors(camera.position, orbitCtrl.target);
+    if (dir.lengthSq() < 0.01) {
+        dir.set(0, 0.5, 1); 
+    }
+    dir.normalize();
+    
+    camera.position.copy(center).add(dir.multiplyScalar(distance));
+    camera.lookAt(center);
+    camera.updateProjectionMatrix();
+    orbitCtrl.update();
+}
+
+function init() { 
+    scene = new THREE.Scene(); 
+    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000); 
+    camera.position.set(0, 30, 110); 
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); 
+    renderer.setSize(window.innerWidth, window.innerHeight); 
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
+    renderer.toneMapping = THREE.ACESFilmicToneMapping; 
+    renderer.toneMappingExposure = 1.3; 
+    document.getElementById('canvas-container').appendChild(renderer.domElement); 
+    orbitCtrl = new THREE.OrbitControls(camera, renderer.domElement); 
+    orbitCtrl.enableDamping = true; 
+    orbitCtrl.dampingFactor = 0.08; 
+    scene.add(new THREE.AmbientLight(0xf0f0f0, 0.8)); 
+    var dl = new THREE.DirectionalLight(0xffffff, 1.2); 
+    dl.position.set(10,20,10); scene.add(dl); 
+    var dl2 = new THREE.DirectionalLight(0x4488ff, 0.3); 
+    dl2.position.set(-20,-10,-30); scene.add(dl2); 
+    buildPeriodicTable(); buildAtom(1); populateTargetAtoms(); animate(); 
+}
+addEventListener('resize', function() { if(camera){camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();} if(renderer)renderer.setSize(window.innerWidth,window.innerHeight); });
+
+function ChargeStream(config) { 
+    this.count = config.count || 120; 
+    this.origin = config.origin || new THREE.Vector3(); 
+    this.direction = config.direction || new THREE.Vector3(0,1,0); 
+    this.color = config.color || 0x00ccff; 
+    this.spread = config.spread || 0.4; 
+    this.speed = config.speed || 8; 
+    this.length = config.length || 18; 
+    this.converge = config.converge || false; 
+    this.visible = config.visible !== false; 
+    this.particleSize = config.particleSize || CFG.ParticleSize; 
+    this.streamType = config.streamType || 'generic'; 
+    this.isChargeStream = true; 
+    this.progress = new Float32Array(this.count); 
+    this.offsets = []; this.vels = []; 
+    for (var i = 0; i < this.count; i++) { 
+        this.progress[i] = Math.random(); 
+        this.offsets.push(new THREE.Vector3((Math.random()-0.5)*this.spread, (Math.random()-0.5)*this.spread, (Math.random()-0.5)*this.spread)); 
+        this.vels.push(0.3 + Math.random() * 0.7); 
+    } 
+    var pos = new Float32Array(this.count * 3), col = new Float32Array(this.count * 3), clr = new THREE.Color(this.color); 
+    for (var i = 0; i < this.count; i++) { col[i*3] = clr.r; col[i*3+1] = clr.g; col[i*3+2] = clr.b; } 
+    var geo = new THREE.BufferGeometry(); 
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); 
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 3)); 
+    this.mesh = new THREE.Points(geo, new THREE.PointsMaterial({ size: this.particleSize, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false, vertexColors: true, sizeAttenuation: true })); 
+}
+ChargeStream.prototype.update = function(dt, sm) { 
+    if (!this.visible) { this.mesh.visible = false; return; } 
+    this.mesh.visible = true; 
+    var pos = this.mesh.geometry.attributes.position.array, col = this.mesh.geometry.attributes.color.array, bc = new THREE.Color(this.color); 
+    for (var i = 0; i < this.count; i++) { 
+        this.progress[i] += dt * this.speed * this.vels[i] * sm / this.length; 
+        if (this.progress[i] > 1) this.progress[i] -= 1; 
+        var t = this.progress[i], o = this.offsets[i], x, y, z, f; 
+        if (this.converge) { 
+            var cv = 1 - t; 
+            x = this.origin.x + this.direction.x*t*this.length + o.x*cv*this.spread*2; 
+            y = this.origin.y + this.direction.y*t*this.length + o.y*cv*this.spread*2; 
+            z = this.origin.z + this.direction.z*t*this.length + o.z*cv*this.spread*2; 
+            f = t < 0.1 ? t/0.1 : t > 0.85 ? (1-t)/0.15 : 1; 
+        } else { 
+            var dv = 0.3 + t * 0.7; 
+            x = this.origin.x + this.direction.x*t*this.length + o.x*dv*this.spread*2; 
+            y = this.origin.y + this.direction.y*t*this.length + o.y*dv*this.spread*2; 
+            z = this.origin.z + this.direction.z*t*this.length + o.z*dv*this.spread*2; 
+            f = t < 0.1 ? t/0.1 : t > 0.8 ? (1-t)/0.2 : 1; 
+        } 
+        pos[i*3] = x; pos[i*3+1] = y; pos[i*3+2] = z; 
+        var br = f * (0.6 + 0.4 * Math.sin(t * Math.PI)); 
+        col[i*3] = bc.r*br; col[i*3+1] = bc.g*br; col[i*3+2] = bc.b*br; 
+    } 
+    this.mesh.geometry.attributes.position.needsUpdate = true; 
+    this.mesh.geometry.attributes.color.needsUpdate = true; 
+};
+
+function BondStream(config) { 
+    this.count = config.count || 100; 
+    this.start = config.start || new THREE.Vector3(); 
+    this.end = config.end || new THREE.Vector3(20,0,0); 
+    this.color = config.color || 0xff00ff; 
+    this.speed = config.speed || 6; 
+    this.visible = config.visible !== false; 
+    this.particleSize = config.particleSize || CFG.ParticleSize * 0.7; 
+    this.bondStatus = config.bondStatus || 'valid'; 
+    this.isBondStream = true; 
+    this.progress = new Float32Array(this.count); 
+    this.offsets = []; 
+    for (var i = 0; i < this.count; i++) { 
+        this.progress[i] = Math.random(); 
+        this.offsets.push(new THREE.Vector3((Math.random()-0.5)*1.5, (Math.random()-0.5)*1.5, (Math.random()-0.5)*1.5)); 
+    } 
+    var pos = new Float32Array(this.count * 3), col = new Float32Array(this.count * 3), clr = new THREE.Color(this.color); 
+    for (var i = 0; i < this.count; i++) { col[i*3] = clr.r; col[i*3+1] = clr.g; col[i*3+2] = clr.b; } 
+    var geo = new THREE.BufferGeometry(); 
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); 
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 3)); 
+    this.mesh = new THREE.Points(geo, new THREE.PointsMaterial({ size: this.particleSize, transparent: true, opacity: this.bondStatus === 'valid' ? 0.6 : 0.3, blending: THREE.AdditiveBlending, depthWrite: false, vertexColors: true, sizeAttenuation: true })); 
+    var lc = this.bondStatus === 'valid' ? 0x00ff88 : this.bondStatus === 'weak' ? 0xffaa00 : this.bondStatus === 'slip' ? 0x00aaff : 0xff4444; 
+    this.line = new THREE.Line(new THREE.BufferGeometry().setFromPoints([this.start, this.end]), new THREE.LineBasicMaterial({ color: lc, transparent: true, opacity: this.bondStatus === 'valid' ? 0.35 : 0.15, blending: THREE.AdditiveBlending })); 
+}
+BondStream.prototype.update = function(dt, sm) { 
+    if (!this.visible) { this.mesh.visible = false; this.line.visible = false; return; } 
+    this.mesh.visible = true; this.line.visible = true; 
+    var pos = this.mesh.geometry.attributes.position.array, col = this.mesh.geometry.attributes.color.array, bc = new THREE.Color(this.color), dist = this.end.clone().sub(this.start); 
+    for (var i = 0; i < this.count; i++) { 
+        this.progress[i] += dt * this.speed * sm / Math.max(dist.length(), 1); 
+        if (this.progress[i] > 1) this.progress[i] -= 1; 
+        var t = this.progress[i], sq = Math.sin(t*Math.PI)*0.4+0.6; 
+        pos[i*3] = this.start.x + dist.x*t + this.offsets[i].x*sq; 
+        pos[i*3+1] = this.start.y + dist.y*t + this.offsets[i].y*sq; 
+        pos[i*3+2] = this.start.z + dist.z*t + this.offsets[i].z*sq; 
+        var f = (t<0.08?t/0.08:t>0.92?(1-t)/0.08:1)*0.8; 
+        col[i*3] = bc.r*f; col[i*3+1] = bc.g*f; col[i*3+2] = bc.b*f; 
+    } 
+    this.mesh.geometry.attributes.position.needsUpdate = true; 
+    this.mesh.geometry.attributes.color.needsUpdate = true; 
+};
+
+function createSpinArrow(spinDir) { var grp = new THREE.Group(), radius = 3.2, arcLen = Math.PI * 1.45, dir = spinDir === '+' ? -1 : 1, ac = spinDir === '+' ? 0xffdd00 : 0x00ddff; grp.userData.isSpinArrow = true; grp.userData.spinMultiplier = dir; var pts = []; for (var i = 0; i <= 48; i++) { var t = i/48; pts.push(new THREE.Vector3(Math.cos(dir*arcLen*t)*radius, 0, Math.sin(dir*arcLen*t)*radius)); } grp.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 48, 0.13, 6, false), new THREE.MeshBasicMaterial({ color: ac, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false }))); function addHead(tv, sz, ln) { var ang = dir*arcLen*tv, p = new THREE.Vector3(Math.cos(ang)*radius, 0, Math.sin(ang)*radius), fw = new THREE.Vector3(-Math.sin(ang), 0, Math.cos(ang)).multiplyScalar(dir).normalize(); var cn = new THREE.Mesh(new THREE.ConeGeometry(sz, ln, 8), new THREE.MeshBasicMaterial({ color: ac, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false })); cn.position.copy(p); cn.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), fw); grp.add(cn); } addHead(0, 0.4, 1.2); addHead(0.12, 0.25, 0.7); return grp; }
+function createHook(isBlocker) { var g = new THREE.Group(), h = new THREE.Mesh(new THREE.TorusGeometry(0.6, 0.12, 8, 16, Math.PI), new THREE.MeshStandardMaterial({ color: CFG.Stack.Colors[5], emissive: CFG.Stack.Colors[5], emissiveIntensity: 0.8, side: THREE.DoubleSide })); h.rotation.y = Math.PI / 2; if (isBlocker) { h.rotation.x = Math.PI; h.position.y = -0.2; } else { h.position.y = 0.2; } g.add(h); return g; }
+
+function createProtonStack(size, key, showDiscs, isCarousel, spinDir, forceColor) { 
+    var grp = new THREE.Group(), sz = typeof size === 'number' ? size : slotCount(size); 
+    if (!sz) return grp; 
+    var r = CFG.Proton.radius, dy = 2*r*CFG.Stack.scaleFactor, yS = -(sz-1)*r*CFG.Stack.scaleFactor*0.5, slotCol = forceColor !== undefined && forceColor !== null ? forceColor : getSlotColor(sz), chargeR = r * CFG.Charge.scaleFactor, nDx = chargeR * 0.66, showSp = document.getElementById('ctrl-spin').checked; 
+    for (var i = 0; i < sz; i++) { 
+        var proton = new THREE.Mesh(new THREE.SphereGeometry(r, CFG.Segments, CFG.Segments), new THREE.MeshLambertMaterial({ color: CFG.Proton.color })); 
+        proton.position.y = yS + i * dy; grp.add(proton); 
+        if (showDiscs) { 
+            var disc = new THREE.Mesh(new THREE.SphereGeometry(chargeR, CFG.Segments, CFG.Segments), new THREE.MeshLambertMaterial({ color: slotCol, transparent: true, opacity: CFG.Charge.maxOpacity })); 
+            disc.position.y = proton.position.y; disc.scale.set(1, 0.05, 1); disc.userData.isDisc = true; grp.add(disc); 
+            if (showSp && spinDir) { var sa = createSpinArrow(spinDir); sa.position.y = proton.position.y + 0.25; grp.add(sa); allSpinArrows.push(sa); } 
+        } 
+        if (i > 0 && i < sz) { 
+            var n1 = new THREE.Mesh(new THREE.SphereGeometry(r, CFG.Segments, CFG.Segments), new THREE.MeshLambertMaterial({ color: CFG.Neutron.color })); 
+            n1.position.set(nDx, proton.position.y - dy/2, 0); grp.add(n1); 
+            var n2 = new THREE.Mesh(new THREE.SphereGeometry(r, CFG.Segments, CFG.Segments), new THREE.MeshLambertMaterial({ color: CFG.Neutron.color })); 
+            n2.position.set(-nDx, proton.position.y - dy/2, 0); grp.add(n2); 
+        } 
+        if (isCarousel) { var hk = createHook(i % 2 !== 0); hk.position.y = proton.position.y; grp.add(hk); } 
+    } 
+    return grp; 
+}
+
+function createAtom3D(z, showDiscs) { 
+    var el = ELEMENTS[z]; if (!el) return null; 
+    var ag = new THREE.Group(), sl = el.slots, g = CFG.Stack.scaleFactor, cS = slotCount(sl.core), dr = el.dirs, carDist = (CFG.CarouselRadius + cS*0.6) * g, capOff = (CFG.CapOffset + cS*0.4) * g; 
+    var coreColor = (z >= 2 && z <= 19) ? 0x0f0ff4 : null; // Force Blue L2 Disc for Z 2-19
+    ag.add(createProtonStack(sl.core, 'core', showDiscs, false, null, coreColor)); 
+    if (slotCount(sl.pn) > 0) { var p = createProtonStack(sl.pn, 'pn', showDiscs, false, dr.N.spin); p.position.y = capOff + slotCount(sl.pn)*g; p.rotation.set(Math.PI/2, 0, Math.PI/2+0.14); ag.add(p); } 
+    if (slotCount(sl.ps) > 0) { var p = createProtonStack(sl.ps, 'ps', showDiscs, false, dr.S.spin); p.position.y = -(capOff + slotCount(sl.ps)*g); p.rotation.set(-Math.PI/2, 0, -Math.PI/2-0.14); ag.add(p); } 
+    [{k:'ce',p:[carDist,0,0],r:[0,0,-Math.PI/2],d:'E'},{k:'cw',p:[-carDist,0,0],r:[0,0,Math.PI/2],d:'W'},{k:'cf',p:[0,0,carDist],r:[-Math.PI/2,0,0],d:'F'},{k:'cb',p:[0,0,-carDist],r:[Math.PI/2,0,0],d:'B'}].forEach(function(c) { var sz = slotCount(sl[c.k]); if (sz > 0) { var s = createProtonStack(sl[c.k], c.k, showDiscs, true, dr[c.d].spin); s.position.set(c.p[0],c.p[1],c.p[2]); s.rotation.set(c.r[0],c.r[1],c.r[2]); ag.add(s); } }); 
+    if (slotCount(sl.capN) > 0) { var c = createProtonStack(sl.capN, 'capN', showDiscs, false, dr.N.spin); c.position.y = capOff*1.5; ag.add(c); } 
+    if (slotCount(sl.capS) > 0) { var c = createProtonStack(sl.capS, 'capS', showDiscs, false, dr.S.spin); c.position.y = -(capOff*1.5); ag.add(c); } 
+    if (slotCount(sl.ctr) > 0) { var c = createProtonStack(sl.ctr, 'ctr', showDiscs, false, null); c.position.set(0, 0.3, 0); ag.add(c); } 
+    ag.add(new THREE.Mesh(new THREE.SphereGeometry(cS*0.8+2, 16, 16), new THREE.MeshBasicMaterial({ color: 0x223355, transparent: true, opacity: 0.06, blending: THREE.AdditiveBlending, depthWrite: false }))); 
+    var lbl = createLabel(el.name, new THREE.Vector3(0, -3-cS*0.5, 0), '#ffffff'); ag.add(lbl); allLabels.push(lbl); 
+    return ag; 
+}
+
+function createElectrons(ag, z) { 
+    if (electronGroup) { if (electronGroup.parent) electronGroup.parent.remove(electronGroup); } 
+    electronGroup = new THREE.Group(); 
+    var el = ELEMENTS[z]; if (!el) return; 
+    var nE = Math.min(z, 18), shells = [2, 8, 8], eR = nE, sI = 0, rads = [6, 11, 16]; 
+    while (eR > 0 && sI < rads.length) { 
+        var eInS = Math.min(eR, shells[sI]), r = rads[sI]; 
+        for (var i = 0; i < eInS; i++) { 
+            var a = (i/eInS) * Math.PI * 2; 
+            var em = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), new THREE.MeshBasicMaterial({ color: CFG.Electron.color, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending })); 
+            var tilt = sI % 2 === 0 ? 0 : Math.PI / 4; 
+            em.position.set(r*Math.cos(a), r*Math.sin(a)*Math.sin(tilt), r*Math.sin(a)*Math.cos(tilt)); 
+            em.userData = { shellRadius: r, angle: a, speed: 1.5-sI*0.2, tilt: tilt }; electronGroup.add(em); 
+        } 
+        eR -= eInS; sI++; 
+    } 
+    ag.add(electronGroup); 
+}
+
+function createLabel(text, position, color) { var cv = document.createElement('canvas'); cv.width = 128; cv.height = 64; var ctx = cv.getContext('2d'); ctx.fillStyle = color || '#00aaff'; ctx.font = 'bold 28px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 64, 32); var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); sp.position.copy(position); sp.scale.set(3, 1.5, 1); sp.userData.isLabel = true; return sp; }
+function createFlowArrow(from, to, color, headLen) { var d = new THREE.Vector3().subVectors(to, from), l = d.length(); if (l < 0.1) return null; d.normalize(); var arrow = new THREE.ArrowHelper(d, from, l, color, headLen||2, 1); arrow.userData.isArrow = true; arrow.line.material.transparent = true; arrow.line.material.opacity = 0.5; arrow.line.material.blending = THREE.AdditiveBlending; arrow.cone.material.transparent = true; arrow.cone.material.opacity = 0.6; arrow.cone.material.blending = THREE.AdditiveBlending; return arrow; }
+function createPressureZone(position, radius, color, strength) { var m = new THREE.Mesh(new THREE.SphereGeometry(radius, 16, 16), new THREE.MeshBasicMaterial({ color: color, transparent: true, opacity: Math.min(0.25, strength*0.15), blending: THREE.AdditiveBlending, depthWrite: false })); m.position.copy(position); m.userData.isPressureZone = true; m.userData.baseOpacity = Math.min(0.25, strength*0.15); m.userData.strength = strength; return m; }
+function createMBNTag(text, position, status) { var cv = document.createElement('canvas'); cv.width = 256; cv.height = 48; var ctx = cv.getContext('2d'); ctx.fillStyle = status==='valid'?'rgba(0,255,136,.15)':status==='weak'?'rgba(255,170,0,.15)':status==='slip'?'rgba(0,170,255,.15)':'rgba(255,68,68,.15)'; ctx.fillRect(0,0,256,48); ctx.fillStyle = status==='valid'?'#0f8':status==='weak'?'#fa0':status==='slip'?'#0af':'#f44'; ctx.font = 'bold 18px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 128, 24); var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false })); sp.position.copy(position); sp.scale.set(8, 1.5, 1); sp.userData.isMBNTag = true; return sp; }
+
+function buildAtom(z) { 
+    savedBaseId = document.getElementById('mbn-base-atom') ? document.getElementById('mbn-base-atom').value : ''; 
+    savedTargetZ = document.getElementById('mbn-target-atom') ? document.getElementById('mbn-target-atom').value : ''; 
+    clearScene(); currentZ = z; currentAtomGroup = new THREE.Group(); 
+    var el = ELEMENTS[z]; document.getElementById('top-formula').textContent=el.name; if (!el) return; 
+    var sl = el.slots, ch = el.charge, g = CFG.Stack.scaleFactor, dr = el.dirs, showD = document.getElementById('ctrl-discs').checked, showL = document.getElementById('ctrl-labels').checked, cS = slotCount(sl.core), carDist = (CFG.CarouselRadius+cS*0.6)*g, capOff = (CFG.CapOffset+cS*0.4)*g; 
+    var coreColor = (z >= 2 && z <= 19) ? 0x0f0ff4 : null; // Force Blue L2 Disc for Z 2-19
+    currentAtomGroup.add(createProtonStack(sl.core, 'core', showD, false, null, coreColor)); 
+    if (showL && cS > 0) { var lb = createLabel('Core:'+cS, new THREE.Vector3(0,-2,0), '#a0a0a0'); currentAtomGroup.add(lb); allLabels.push(lb); } 
+    if (slotCount(sl.pn) > 0) { var p = createProtonStack(sl.pn, 'pn', showD, false, dr.N.spin); p.position.y = capOff+slotCount(sl.pn)*g; p.rotation.set(Math.PI/2,0,Math.PI/2+0.14); currentAtomGroup.add(p); if (showL) { var lb = createLabel('PN:'+slotCount(sl.pn)+'/'+dr.N.spin, new THREE.Vector3(2,p.position.y+2,0), dr.N.spin==='+'?'#ffdd00':'#00ddff'); currentAtomGroup.add(lb); allLabels.push(lb); } } 
+    if (slotCount(sl.ps) > 0) { var p = createProtonStack(sl.ps, 'ps', showD, false, dr.S.spin); p.position.y = -(capOff+slotCount(sl.ps)*g); p.rotation.set(-Math.PI/2,0,-Math.PI/2-0.14); currentAtomGroup.add(p); if (showL) { var lb = createLabel('PS:'+slotCount(sl.ps)+'/'+dr.S.spin, new THREE.Vector3(2,p.position.y-2,0), dr.S.spin==='+'?'#ffdd00':'#00ddff'); currentAtomGroup.add(lb); allLabels.push(lb); } } 
+    [{k:'ce',l:'E',p:[carDist,0,0],r:[0,0,-Math.PI/2]},{k:'cw',l:'W',p:[-carDist,0,0],r:[0,0,Math.PI/2]},{k:'cf',l:'F',p:[0,0,carDist],r:[-Math.PI/2,0,0]},{k:'cb',l:'B',p:[0,0,-carDist],r:[Math.PI/2,0,0]}].forEach(function(c) { var sz = slotCount(sl[c.k]); if (sz > 0) { var sp = dr[c.l].spin, s = createProtonStack(sl[c.k], c.k, showD, true, sp); s.position.set(c.p[0],c.p[1],c.p[2]); s.rotation.set(c.r[0],c.r[1],c.r[2]); currentAtomGroup.add(s); if (showL) { var lb = createLabel(c.l+':'+sz+'/'+sp+'/'+dr[c.l].hook, new THREE.Vector3(c.p[0]*1.3,2,c.p[2]*1.3), sp==='+'?'#ffdd00':'#00ddff'); currentAtomGroup.add(lb); allLabels.push(lb); } } }); 
+    if (slotCount(sl.capN) > 0) { var c = createProtonStack(sl.capN, 'capN', showD, false, dr.N.spin); c.position.y = capOff*1.5; currentAtomGroup.add(c); } 
+    if (slotCount(sl.capS) > 0) { var c = createProtonStack(sl.capS, 'capS', showD, false, dr.S.spin); c.position.y = -(capOff*1.5); currentAtomGroup.add(c); } 
+    if (slotCount(sl.ctr) > 0) { var c = createProtonStack(sl.ctr, 'ctr', showD, false, null); c.position.set(0, 0.3, 0); currentAtomGroup.add(c); } 
+    createElectrons(currentAtomGroup, z); 
+    var topY = (capOff*1.5) + (slotCount(sl.capN)>0?3:0) + (slotCount(sl.pn)>0?2:0), botY = -topY; 
+    if (document.getElementById('ctrl-through').checked) { var pt = el.thruCh; var ts = new ChargeStream({ count: Math.floor(60+pt*40), origin: new THREE.Vector3(0,botY,0), direction: new THREE.Vector3(0,1,0), color: 0x4466ff, spread: 1.5, speed: 6+pt*4, length: topY-botY, converge: false, streamType: 'through' }); scene.add(ts.mesh); allChargeStreams.push(ts); } 
+    if (ch.sIn > 0.05) { var sI = new ChargeStream({ count: Math.floor(80*ch.sIn), origin: new THREE.Vector3(0,botY-10,0), direction: new THREE.Vector3(0,1,0), color: 0xff8800, spread: 3+ch.sIn*2, speed: 10, length: 14, converge: true, streamType: 'intake' }); scene.add(sI.mesh); allChargeStreams.push(sI); } 
+    if (ch.nEm > 0.05) { var nE = new ChargeStream({ count: Math.floor(80*ch.nEm), origin: new THREE.Vector3(0,topY+1,0), direction: new THREE.Vector3(0,1,0), color: 0x00ccff, spread: 2+ch.nEm*3, speed: 10, length: 16, converge: false, streamType: 'emission' }); scene.add(nE.mesh); allChargeStreams.push(nE); } 
+    [{k:'eEm',d:new THREE.Vector3(1,0,0),c:0x00ff88},{k:'wEm',d:new THREE.Vector3(-1,0,0),c:0x00dd77},{k:'fEm',d:new THREE.Vector3(0,0,1),c:0x00cc66},{k:'bEm',d:new THREE.Vector3(0,0,-1),c:0x00bb55}].forEach(function(ed) { if (ch[ed.k] > 0.05) { var eq = new ChargeStream({ count: Math.floor(60*ch[ed.k]), origin: new THREE.Vector3(ed.d.x*carDist,0,ed.d.z*carDist), direction: ed.d, color: ed.c, spread: 1+ch[ed.k]*2, speed: 7, length: 12, converge: false, streamType: 'equatorial' }); scene.add(eq.mesh); allChargeStreams.push(eq); } }); 
+    if (ch.sIn > 0.1) { var a = createFlowArrow(new THREE.Vector3(0,botY-8,0), new THREE.Vector3(0,botY-2,0), 0xff8800, 1.5); if (a) { scene.add(a); allArrows.push(a); } } 
+    if (ch.nEm > 0.1) { var a = createFlowArrow(new THREE.Vector3(0,topY+2,0), new THREE.Vector3(0,topY+8,0), 0x00ccff, 1.5); if (a) { scene.add(a); allArrows.push(a); } } 
+    var pt2 = el.thruCh; [{d:'E',k:'ce',c:0x00ff88},{d:'W',k:'cw',c:0x00dd77},{d:'F',k:'cf',c:0x00cc66},{d:'B',k:'cb',c:0x00bb55}].forEach(function(p) { var pr = MathisQ.equatorialPressure(sl[p.k], dr[p.d].spin, dr[p.d].hook, pt2); if (pr > 0.01) { var dv = DIR_VECTORS[p.d], pz = createPressureZone(new THREE.Vector3(dv.x*carDist*1.5,0,dv.z*carDist*1.5), 2+pr*3, p.c, pr); scene.add(pz); allPressureZones.push(pz); } }); 
+    currentAtomGroup.add(new THREE.Mesh(new THREE.SphereGeometry(carDist*1.5, 32, 32), new THREE.MeshBasicMaterial({ color: 0x2244aa, transparent: true, opacity: 0.08, blending: THREE.AdditiveBlending, depthWrite: false }))); 
+    scene.add(currentAtomGroup); selectedElementDetailsVisible = false; closeAtomPopup(); updateSlotMap(z); updateInfoPanel(z); currentMolAtoms = []; updateBaseUI(); 
+    if (savedTargetZ) { var tgtSel = document.getElementById('mbn-target-atom'); if (tgtSel) tgtSel.value = savedTargetZ; } 
+    document.querySelectorAll('.el-btn').forEach(function(b) { b.classList.remove('active'); }); 
+    var ab = document.querySelector('.el-btn[data-z="'+z+'"]'); if (ab) ab.classList.add('active'); runNMR();
+    frameObject(currentAtomGroup); 
+}
+
+function setMol(f) { document.getElementById('mol-input').value = f; buildMolecule(); }
+function parseFormula(f) { var a = [], r = /([A-Z][a-z]*)(\d*)/g, m; while ((m = r.exec(f)) !== null) { var s = m[1], c = m[2] ? parseInt(m[2]) : 1, z = SYMBOL_TO_Z[s]; if (z) for (var i = 0; i < c; i++) a.push({z:z, label:s}); } return a; }
+function formulaFromAtoms(atoms) { var counts = {}, order = []; atoms.forEach(function(a) { var sym = ELEMENTS[a.z] ? ELEMENTS[a.z].name : null; if (!sym) return; if (typeof counts[sym] === 'undefined') { counts[sym] = 0; order.push(sym); } counts[sym]++; }); return order.map(function(sym) { var n = counts[sym]; return sym + (n > 1 ? n : ''); }).join(''); }
+function syncMoleculeFormula() { var input = document.getElementById('mol-input'); if (input) input.value = formulaFromAtoms(currentMolAtoms); }
+
+function buildMolecule() { 
+    resetMBNBuilderState(); savedBaseId = ''; savedTargetZ = ''; clearScene(); currentMolGroup = new THREE.Group(); 
+    var f = document.getElementById('mol-input').value.trim().replace(/[^A-Za-z0-9]/g, ''), pa = parseFormula(f); 
+    document.getElementById('top-formula').textContent=f; 
+    if (!pa.length) { scene.add(currentMolGroup); updateBaseUI(); restoreMBN(); runNMR(); return; } 
+    currentMolAtoms = []; atomIdCounter = 1; 
+    var aP = [], oD = {}, mo = '<b>MBN for ' + f + ':</b><br><span style="color:#0af">Core: ' + pa[0].label + '</span><br>'; 
+    aP.push(new THREE.Vector3(0,0,0)); oD[1] = new Set(); var bondCache = {}; 
+
+    for (var idx = 1; idx < pa.length; idx++) { 
+        var ad = pa[idx], bB = null, bI = -1; 
+        for (var bi = 0; bi < idx; bi++) { 
+            var bZ = pa[bi].z, bId = bi + 1, oc = oD[bId] || new Set(); 
+            var cacheKey = bZ + '-' + ad.z + '-' + Array.from(oc).sort().join(','); 
+            var bd; 
+            if (bondCache.hasOwnProperty(cacheKey)) bd = bondCache[cacheKey]; 
+            else { bd = findBestBond(bZ, ad.z, oc, new Set()); bondCache[cacheKey] = bd; } 
+            if (bd && bd.bondStatus !== 'invalid' && (!bB || bd.strength > bB.strength)) { bB = bd; bI = bi; } 
+        } 
+        
+        if (bB) { 
+            var bPs = aP[bI], dir = DIR_VECTORS[bB.dirA], dist = 22+slotCount(ELEMENTS[pa[bI].z].slots.core)*2+slotCount(ELEMENTS[ad.z].slots.core)*2; 
+            var bP = bPs.clone().add(dir.clone().multiplyScalar(dist)); var bI2 = bI + 1; 
+            if (!oD[bI2]) oD[bI2] = new Set(); oD[bI2].add(bB.dirA); oD[idx + 1] = new Set([bB.dirB]); 
+            var sA = bB.slotA, sB = bB.slotB, sc = bB.bondStatus === 'valid' ? '#0f8' : bB.bondStatus === 'weak' ? '#fa0' : bB.bondStatus === 'slip' ? '#0af' : '#f44'; 
+            var ha = sA.hook !== 'none' ? '/' + sA.hook : '', hb = sB.hook !== 'none' ? '/' + sB.hook : ''; 
+            mo += '<span style="color:' + sc + '">' + pa[bI].label + ' ' + bB.prefix + '[' + bB.dirA + ':' + sA.size + '/' + sA.spin + ha + ']>[' + bB.dirB + ':' + sB.size + '/' + sB.spin + hb + '] ' + ad.label + ' (' + formatChargeFlowStrength(bB.strength) + ')</span><br>'; 
+            var bc = bB.bondStatus === 'valid' ? 0x00ff88 : bB.bondStatus === 'weak' ? 0xffaa00 : bB.bondStatus === 'slip' ? 0x00aaff : 0xff4444; 
+            var sp = bPs.clone().add(DIR_VECTORS[bB.dirA].clone().multiplyScalar(5)), ep = bP.clone().add(DIR_VECTORS[bB.dirB].clone().multiplyScalar(5)); 
+            var isThroughCharge = (bB.dirA === 'N' && bB.dirB === 'S') || (bB.dirA === 'S' && bB.dirB === 'N'); 
+            var bCount = isThroughCharge ? 150 : 80; 
+            var bs = new BondStream({ start: sp, end: ep, color: bc, speed: 6, count: bCount, bondStatus: bB.bondStatus }); 
+            scene.add(bs.mesh); scene.add(bs.line); allChargeStreams.push(bs); 
+            var mp = sp.clone().add(ep).multiplyScalar(0.5), pz = createPressureZone(mp, 3, bc, bB.strength / 100); 
+            scene.add(pz); allPressureZones.push(pz); 
+            var tg = createMBNTag(bB.prefix + '[' + bB.dirA + ':' + sA.size + '/' + sA.spin + ']>[' + bB.dirB + ':' + sB.size + '/' + sB.spin + ']', new THREE.Vector3(mp.x, mp.y + 3, mp.z), bB.bondStatus); 
+            scene.add(tg); allMBNTags.push(tg); aP.push(bP); 
+        } else { 
+            var ang = ((idx - 1) / Math.max(1, pa.length - 1)) * Math.PI * 2, rD = 25 + slotCount(ELEMENTS[ad.z].slots.core) * 2; 
+            aP.push(new THREE.Vector3(rD * Math.cos(ang), 0, rD * Math.sin(ang))); oD[idx + 1] = new Set(); 
+            mo += '<span style="color:#f66">' + ad.label + ': No valid MBN</span><br>'; 
+        } 
+    } 
+    pa.forEach(function(ad, idx) { var ag = createAtom3D(ad.z, document.getElementById('ctrl-discs').checked); if (ag) { ag.position.copy(aP[idx]); currentMolGroup.add(ag); currentMolAtoms.push({ id: atomIdCounter++, z: ad.z, position: aP[idx].clone(), occupiedDirs: oD[idx+1] || new Set() }); } }); 
+    
+    mo += '<br><b style="color:#ff0">First Ionization Energy (MBN Context):</b><br>';
+    currentMolAtoms.forEach(function(a) {
+        var el = ELEMENTS[a.z];
+        var ie1 = MathisQ.calculateIE1(el.slots, el.dirs, a.occupiedDirs);
+        mo += '<span style="color:#aaa">' + el.name + ' (ID:'+a.id+'): <span style="color:#ff0">' + ie1.toFixed(1) + ' (Mathis Index)</span></span><br>';
+    });
+    mo += '<br><span style="color:#555; font-size:10px; display:block; margin-top:8px;">Calculation Engine Reference: <a href="' + MathisQ.SOURCE_URL + '" target="_blank" style="color:#0af; text-decoration:underline;">Phase 2 Atomic Structure</a></span>';
+
+    syncMoleculeFormula(); scene.add(currentMolGroup); document.getElementById('mol-info').innerHTML = mo; updateBaseUI(); restoreMBN(); validateLayout(); runNMR();
+    frameObject(currentMolGroup); 
+}
+
+function restoreMBN() { if (savedTargetZ) { var tgt = document.getElementById('mbn-target-atom'); if (tgt) tgt.value = savedTargetZ; } if (savedBaseId) { var s = document.getElementById('mbn-base-atom'); if (s) { for (var i = 0; i < s.options.length; i++) if (s.options[i].value === savedBaseId) { s.value = savedBaseId; break; } } } }
+function clearScene() { if (currentAtomGroup) { currentAtomGroup.traverse(function(c) { if (c.geometry) c.geometry.dispose(); if (c.material) c.material.dispose(); }); scene.remove(currentAtomGroup); currentAtomGroup = null; } if (currentMolGroup) { currentMolGroup.traverse(function(c) { if (c.geometry) c.geometry.dispose(); if (c.material) c.material.dispose(); }); scene.remove(currentMolGroup); currentMolGroup = null; } allChargeStreams.forEach(function(s) { if (s.mesh) scene.remove(s.mesh); if (s.line) scene.remove(s.line); }); allChargeStreams = []; allLabels.forEach(function(l) { scene.remove(l); }); allLabels = []; allArrows.forEach(function(a) { scene.remove(a); }); allArrows = []; allPressureZones.forEach(function(p) { scene.remove(p); }); allPressureZones = []; allMBNTags.forEach(function(t) { scene.remove(t); }); allMBNTags = []; allSpinArrows = []; if (electronGroup) { scene.remove(electronGroup); electronGroup = null; } }
+
+function rebuildMolVis() { 
+    if (!currentMolGroup) return; 
+    allChargeStreams.forEach(function(s) { if (s.mesh) scene.remove(s.mesh); if (s.line) scene.remove(s.line); }); allChargeStreams = []; 
+    allPressureZones.forEach(function(p) { scene.remove(p); }); allPressureZones = []; 
+    allMBNTags.forEach(function(t) { scene.remove(t); }); allMBNTags = []; allSpinArrows = []; 
+    var ci = 0; currentMolGroup.children.forEach(function(c) { if (c.isGroup && currentMolAtoms[ci]) { c.position.copy(currentMolAtoms[ci].position); ci++; } }); 
+    for (var i = 0; i < currentMolAtoms.length; i++) for (var j = i+1; j < currentMolAtoms.length; j++) { 
+        var a = currentMolAtoms[i], b = currentMolAtoms[j], d = a.position.distanceTo(b.position), br = 25+slotCount(ELEMENTS[a.z].slots.core)*2+slotCount(ELEMENTS[b.z].slots.core)*2; 
+        if (d < br*1.5) { 
+            var dA = determineDirection(a.position, b.position), dB = determineDirection(b.position, a.position), mb = analyzeMBN(a.z, b.z).find(function(x) { return x.dirA===dA && x.dirB===dB; }); 
+            if (mb && mb.bondStatus !== 'invalid') { 
+                var bc = mb.bondStatus==='valid'?0x00ff88:mb.bondStatus==='weak'?0xffaa00:mb.bondStatus==='slip'?0x00aaff:0xff4444; 
+                var sp = a.position.clone().add(DIR_VECTORS[dA].clone().multiplyScalar(5)), ep = b.position.clone().add(DIR_VECTORS[dB].clone().multiplyScalar(5)); 
+                var isThroughCharge = (dA === 'N' && dB === 'S') || (dA === 'S' && dB === 'N'); 
+                var bCount = isThroughCharge ? 150 : 80; 
+                var bs = new BondStream({ start:sp, end:ep, color:bc, speed:6, count:bCount, bondStatus:mb.bondStatus }); 
+                scene.add(bs.mesh); scene.add(bs.line); allChargeStreams.push(bs); 
+                var mid = sp.clone().add(ep).multiplyScalar(0.5); var pz = createPressureZone(mid, 3, bc, mb.strength/100); 
+                scene.add(pz); allPressureZones.push(pz); 
+                var tg = createMBNTag(mb.prefix+'['+dA+':'+mb.slotA.size+'/'+mb.slotA.spin+']>['+dB+':'+mb.slotB.size+'/'+mb.slotB.spin+']', new THREE.Vector3(mid.x,mid.y+3,mid.z), mb.bondStatus); 
+                scene.add(tg); allMBNTags.push(tg); 
+            } 
+        } 
+    } 
+    currentMolAtoms.forEach(function(ad) { 
+        var el = ELEMENTS[ad.z]; if (!el) return; var ch = el.charge, sl = el.slots, g = CFG.Stack.scaleFactor, cS = slotCount(sl.core), cO = (CFG.CapOffset+cS*0.4)*g; 
+        var ty = ad.position.y+cO*1.5, by = ad.position.y-cO*1.5; 
+        if (ch.sIn > 0.1) { var sI = new ChargeStream({ count: Math.floor(40*ch.sIn), origin: new THREE.Vector3(ad.position.x,by-8,ad.position.z), direction: new THREE.Vector3(0,1,0), color: 0xff8800, spread: 2, speed: 8, length: 10, converge: true, streamType: 'intake' }); scene.add(sI.mesh); allChargeStreams.push(sI); } 
+        if (ch.nEm > 0.1) { var nE = new ChargeStream({ count: Math.floor(40*ch.nEm), origin: new THREE.Vector3(ad.position.x,ty+1,ad.position.z), direction: new THREE.Vector3(0,1,0), color: 0x00ccff, spread: 2, speed: 8, length: 12, converge: false, streamType: 'emission' }); scene.add(nE.mesh); allChargeStreams.push(nE); } 
+    }); 
+}
+
+function determineDirection(from, to) { var delta = new THREE.Vector3().subVectors(to, from); var absX = Math.abs(delta.x), absY = Math.abs(delta.y), absZ = Math.abs(delta.z); if (absX >= absY && absX >= absZ) return delta.x >= 0 ? 'E' : 'W'; if (absY >= absX && absY >= absZ) return delta.y >= 0 ? 'N' : 'S'; return delta.z >= 0 ? 'F' : 'B'; }
+
+function validateLayoutAtoms(atoms) { 
+    if (!atoms || !atoms.length) return { score:0, bonds:[], warnings:[], suggestions:[] }; 
+    var r = { score:0, bonds:[], warnings:[], suggestions:[] }; 
+    for (var i = 0; i < atoms.length; i++) for (var j = i+1; j < atoms.length; j++) { 
+        var a = atoms[i], b = atoms[j], d = a.position.distanceTo(b.position), br = 25+slotCount(ELEMENTS[a.z].slots.core)*2+slotCount(ELEMENTS[b.z].slots.core)*2; 
+        if (d < br*1.5) { 
+            var dA = determineDirection(a.position, b.position), dB = determineDirection(b.position, a.position), mb = analyzeMBN(a.z, b.z).find(function(x) { return x.dirA===dA && x.dirB===dB; }); 
+            if (mb) { 
+                r.bonds.push({ atomA:a, atomB:b, dirA:mb.dirA, dirB:mb.dirB, slotA:mb.slotA, slotB:mb.slotB, bondType:mb.bondType, bondStatus:mb.bondStatus, prefix:mb.prefix, strength:mb.strength, mbnStr:mb.mbnStr, spatialDir:dA, distance:d }); 
+                if (mb.bondStatus === 'invalid') {
+                    var emA = mb.slotA.em > 0.2, emB = mb.slotB.em > 0.2, inA = mb.slotA.intake > 0.2, inB = mb.slotB.intake > 0.2;
+                    if ((emA && emB) || (inA && inB)) r.warnings.push(ELEMENTS[a.z].name+'<->'+ELEMENTS[b.z].name+': Polar Repulsion ('+dA+'-'+dB+')');
+                    else if (mb.slotA.spin === mb.slotB.spin) r.warnings.push(ELEMENTS[a.z].name+'<->'+ELEMENTS[b.z].name+': Carousel Spin Clash ('+dA+'-'+dB+')');
+                    else r.warnings.push(ELEMENTS[a.z].name+'<->'+ELEMENTS[b.z].name+': Blocked '+dA+'-'+dB);
+                } else if (mb.bondStatus === 'slip') { 
+                    r.warnings.push(ELEMENTS[a.z].name+'<->'+ELEMENTS[b.z].name+': Slip '+dA+'-'+dB); 
+                    r.suggestions.push('Rotate '+ELEMENTS[b.z].name+'.'); 
+                } else if (mb.bondStatus === 'weak') {
+                    r.suggestions.push(ELEMENTS[a.z].name+'<->'+ELEMENTS[b.z].name+': Weak ('+dA+').');
+                }
+            } 
+        } 
+    } 
+    var du = {}; atoms.forEach(function(a) { du[a.id] = new Set(); }); 
+    r.bonds.forEach(function(b) { if (du[b.atomA.id].has(b.dirA)) r.warnings.push(ELEMENTS[b.atomA.z].name+': '+b.dirA+' multi!'); if (du[b.atomB.id].has(b.dirB)) r.warnings.push(ELEMENTS[b.atomB.z].name+': '+b.dirB+' multi!'); du[b.atomA.id].add(b.dirA); du[b.atomB.id].add(b.dirB); }); 
+    r.score = MathisQ.layoutScore(r.bonds, atoms.length); 
+    if (r.score >= 70) r.suggestions.unshift('Well-aligned per MBN.'); else if (r.score >= 40) r.suggestions.unshift('Moderate. Try Auto-Align.'); else r.suggestions.unshift('Poor. Use Auto-Align.'); 
+    return r; 
+}
+
+function validateLayout() { 
+    if (!currentMolAtoms.length) { document.getElementById('layout-score-label').textContent='No molecule loaded'; document.getElementById('score-fill').style.width='0%'; document.getElementById('bond-list').innerHTML=''; document.getElementById('warning-list').innerHTML=''; document.getElementById('compat-matrix').innerHTML=''; return; } 
+    var r = validateLayoutAtoms(currentMolAtoms); 
+    document.getElementById('layout-score-label').textContent = 'MBN Alignment: '+r.score+'%'; 
+    var f = document.getElementById('score-fill'); f.style.width = r.score+'%'; f.textContent = r.score+'%'; f.className = 'score-fill '+(r.score>=70?'high':r.score>=40?'mid':'low'); 
+    var bh = ''; 
+    if (!r.bonds.length) bh = '<div style="color:#555;font-size:10px;padding:4px">No bonds.</div>'; 
+    else r.bonds.forEach(function(b) { bh += '<div class="bond-entry '+b.bondStatus+'"><div class="bond-dot '+b.bondStatus+'"></div><div class="bond-mbn">'+ELEMENTS[b.atomA.z].name+' '+b.prefix+'['+b.dirA+':'+b.slotA.size+'/'+b.slotA.spin+']>['+b.dirB+':'+b.slotB.size+'/'+b.slotB.spin+'] '+ELEMENTS[b.atomB.z].name+'</div><div class="bond-strength">'+formatChargeFlowStrength(b.strength)+'</div></div>'; }); 
+    document.getElementById('bond-list').innerHTML = bh; 
+    var wh = ''; r.warnings.forEach(function(w) { wh += '<div class="warning-item">'+w+'</div>'; }); r.suggestions.forEach(function(s) { wh += '<div class="suggestion-item">'+s+'</div>'; }); 
+    document.getElementById('warning-list').innerHTML = wh; renderCompat(); 
+}
+function renderCompat() { 
+    if (currentMolAtoms.length < 2) { document.getElementById('compat-matrix').innerHTML = ''; return; } 
+    var uz = [], sn = {}; currentMolAtoms.forEach(function(a) { if (!sn[a.z]) { sn[a.z] = true; uz.push(a.z); } }); 
+    var h = '<table><tr><th></th>'; uz.forEach(function(z) { h += '<th>'+ELEMENTS[z].name+'</th>'; }); h += '</tr>'; 
+    uz.forEach(function(z1) { h += '<tr><th>'+ELEMENTS[z1].name+'</th>'; uz.forEach(function(z2) { if (z1===z2) h += '<td class="compat-cell none">-</td>'; else { var b = analyzeMBN(z1,z2).sort(function(a,b){return b.strength-a.strength})[0]; var c = b.strength>=50?'high':b.strength>=20?'mid':b.strength>0?'low':'none'; h += '<td class="compat-cell '+c+'" title="'+b.mbnStr+' • '+formatChargeFlowStrength(b.strength)+'">'+b.strength+'</td>'; } }); h += '</tr>'; }); h += '</table>'; 
+    document.getElementById('compat-matrix').innerHTML = h; 
+}
+function resetLayout() { var f = document.getElementById('mol-input').value.trim(); if (f) buildMolecule(); }
+function populateTargetAtoms() { var s = document.getElementById('mbn-target-atom'); s.innerHTML = ''; var blank = document.createElement('option'); blank.value = ''; blank.innerHTML = 'Select target'; s.appendChild(blank); for (var i = 1; i <= 98; i++) if (ELEMENTS[i]) { var o = document.createElement('option'); o.value = i; o.innerHTML = i+' - '+ELEMENTS[i].name; s.appendChild(o); } }
+function resetMBNBuilderState() { var base = document.getElementById('mbn-base-atom'); if (base) { base.innerHTML = ''; var noAtoms = document.createElement('option'); noAtoms.value = ''; noAtoms.innerHTML = 'No atoms'; base.appendChild(noAtoms); base.selectedIndex = 0; } var target = document.getElementById('mbn-target-atom'); if (target) target.selectedIndex = 0; var results = document.getElementById('mbn-results'); if (results) results.innerHTML = ''; savedBaseId = ''; savedTargetZ = ''; }
+function updateBaseUI() { var s = document.getElementById('mbn-base-atom'), sv = s ? s.value : ''; if (!s) return; s.innerHTML = ''; if (!currentMolAtoms.length) { var o = document.createElement('option'); o.value = ''; o.innerHTML = 'No atoms'; s.appendChild(o); return; } currentMolAtoms.forEach(function(a) { var o = document.createElement('option'); o.value = a.id; o.innerHTML = 'ID:'+a.id+' - '+ELEMENTS[a.z].name; s.appendChild(o); }); for (var i = 0; i < s.options.length; i++) if (s.options[i].value === sv) { s.value = sv; break; } }
+
+function checkMBNConnections() { 
+    var bid = parseInt(document.getElementById('mbn-base-atom').value), tz = parseInt(document.getElementById('mbn-target-atom').value); 
+    var ba = currentMolAtoms.find(function(a) { return a.id === bid; }); 
+    if (!ba || !ELEMENTS[tz]) { document.getElementById('mbn-results').innerHTML = "<span style='color:#f66'>Invalid.</span>"; return; } 
+    var bonds = analyzeMBN(ba.z, tz), h = '<b>Bonds:</b><br>'; 
+    bonds.forEach(function(b) { 
+        var ha = b.slotA.hook!=='none'?'/'+b.slotA.hook:'', hb = b.slotB.hook!=='none'?'/'+b.slotB.hook:''; 
+        var ms = ELEMENTS[ba.z].name + ' ' + b.prefix + '[' + b.dirA + ':' + b.slotA.size + '/' + b.slotA.spin + ha + ']>' + '[' + b.dirB + ':' + b.slotB.size + '/' + b.slotB.spin + hb + '] ' + ELEMENTS[tz].name; 
+        var strengthText = formatChargeFlowStrength(b.strength); 
+        if (ba.occupiedDirs.has(b.dirA)) h += '<div style="color:#555;text-decoration:line-through;margin-bottom:4px">'+ms+' ('+strengthText+')</div>'; 
+        else if (b.bondStatus==='valid'||b.bondStatus==='weak') h += '<div style="margin-bottom:4px"><span style="color:'+(b.bondStatus==='valid'?'#0f8':'#fa0')+'">'+ms+' ['+strengthText+']</span> <button class="mbn-btn" onclick="addViaMBN('+ba.id+','+tz+",\'"+b.dirA+"',\'"+b.dirB+"')\">Add</button></div>"; 
+        else if (b.bondStatus==='slip') h += '<div style="color:#0af;margin-bottom:4px">'+ms+' (Slip, '+strengthText+')</div>'; 
+        else h += '<div style="color:#f66;margin-bottom:4px">'+ms+' (Blocked, '+strengthText+')</div>'; 
+    }); 
+    document.getElementById('mbn-results').innerHTML = h; 
+}
+function addViaMBN(bid, tz, dA, dB) { 
+    var bd = currentMolAtoms.find(function(a) { return a.id === bid; }); if (!bd) return; bd.occupiedDirs.add(dA); 
+    var dist = 22+slotCount(ELEMENTS[bd.z].slots.core)*2+slotCount(ELEMENTS[tz].slots.core)*2; var np = bd.position.clone().add(DIR_VECTORS[dA].clone().multiplyScalar(dist)); 
+    var ag = createAtom3D(tz, document.getElementById('ctrl-discs').checked); 
+    if (ag) { 
+        ag.position.copy(np); currentMolGroup.add(ag); var bi = analyzeMBN(bd.z, tz).find(function(b) { return b.dirA===dA && b.dirB===dB; }); 
+        var bst = bi ? bi.bondStatus : 'weak'; var bc = bst==='valid'?0x00ff88:bst==='weak'?0xffaa00:0x00aaff; 
+        var sp = bd.position.clone().add(DIR_VECTORS[dA].clone().multiplyScalar(5)), ep = np.clone().add(DIR_VECTORS[dB].clone().multiplyScalar(5)); 
+        var isThroughCharge = (dA === 'N' && dB === 'S') || (dA === 'S' && dB === 'N'); 
+        var bCount = isThroughCharge ? 150 : 80; 
+        var bS = new BondStream({ start:sp, end:ep, color:bc, speed:6, count:bCount, bondStatus:bst }); 
+        scene.add(bS.mesh); scene.add(bS.line); allChargeStreams.push(bS); 
+        var mid = sp.clone().add(ep).multiplyScalar(0.5); var pz = createPressureZone(mid, 3, bc, (bi?bi.strength:30)/100); 
+        scene.add(pz); allPressureZones.push(pz); 
+        if (bi) { var tg = createMBNTag(bi.prefix+'['+dA+':'+bi.slotA.size+'/'+bi.slotA.spin+']>['+dB+':'+bi.slotB.size+'/'+bi.slotB.spin+']', new THREE.Vector3(mid.x,mid.y+3,mid.z), bst); scene.add(tg); allMBNTags.push(tg); } 
+        currentMolAtoms.push({ id: atomIdCounter++, z:tz, position:np, occupiedDirs: new Set([dB]) }); syncMoleculeFormula(); updateBaseUI(); checkMBNConnections(); validateLayout(); runNMR(); 
+        frameObject(currentMolGroup); 
+    } 
+}
+
+function autoAlignMolecule() { 
+    if (!currentMolAtoms.length) return; var at = currentMolAtoms.slice(), pos = new Map(), vis = new Set(); 
+    pos.set(at[0].id, { p:new THREE.Vector3(0,0,0), o:new Set() }); vis.add(at[0].id); var q = [at[0]], sf = 0; 
+    while (q.length && sf < 200) { 
+        sf++; var c = q.shift(), cp = pos.get(c.id).p, co = pos.get(c.id).o; 
+        for (var ni = 0; ni < at.length; ni++) { 
+            var n = at[ni]; if (vis.has(n.id)) continue; var bb = findBestBond(c.z, n.z, co, new Set()); 
+            if (bb && bb.bondStatus !== 'invalid') { var dir = DIR_VECTORS[bb.dirA], dist = 22+slotCount(ELEMENTS[c.z].slots.core)*2+slotCount(ELEMENTS[n.z].slots.core)*2; co.add(bb.dirA); pos.set(n.id, { p:cp.clone().add(dir.clone().multiplyScalar(dist)), o:new Set([bb.dirB]) }); vis.add(n.id); q.push(n); } 
+        } 
+    } 
+    pos.forEach(function(d, id) { var a = currentMolAtoms.find(function(x) { return x.id === id; }); if (a) { a.position.copy(d.p); a.occupiedDirs = d.o; } }); rebuildMolVis(); validateLayout(); runNMR();
+    frameObject(currentMolGroup); 
+}
+
+function showAtomPopup(z) { 
+    var el = ELEMENTS[z]; if (!el) return; var w = ATOMIC_WEIGHTS[z]||'-', f = ATOMIC_FORMS[z]||'-', cat = ATOMIC_CATS[z]||'-', d = el.dirs; 
+    document.getElementById('popup-z').textContent = z; document.getElementById('popup-sym').textContent = el.name; document.getElementById('popup-weight').textContent = w; document.getElementById('popup-name').textContent = el.name; document.getElementById('popup-cat').textContent = cat; 
+    var cc = {'Nonmetal':'#0f8','Noble Gas':'#0af','Alkali Metal':'#f44','Alkaline Earth':'#fa0','Metalloid':'#0ff','Halogen':'#ff0','Transition':'#f8f','Post-Transition':'#8af','Lanthanide':'#a8f','Actinide':'#f88'}; 
+    var box = document.getElementById('popup-sym-box'); box.style.borderColor = cc[cat]||'#0af'; box.querySelector('.sym').style.color = cc[cat]||'#0af'; 
+    var bh = '<div class="popup-grid"><div class="popup-field"><div class="pf-label">Z</div><div class="pf-value">'+z+'</div></div><div class="popup-field"><div class="pf-label">Weight</div><div class="pf-value">'+w+'</div></div><div class="popup-field"><div class="pf-label">Category</div><div class="pf-value" style="color:'+(cc[cat]||'#0af')+'">'+cat+'</div></div><div class="popup-field"><div class="pf-label">Form</div><div class="pf-value">'+f.charAt(0).toUpperCase()+f.slice(1)+'</div></div></div>'; 
+    bh += '<div class="popup-section"><h4>Directional MBN</h4><div class="popup-dir-grid">'; 
+    ['N','S','E','W','F','B'].forEach(function(dir) { var dv = d[dir], isCW = dv.spin === '+'; bh += '<div class="popup-dir-cell"><div class="dir-name">'+dir+'</div><div class="dir-spin '+(isCW?'cw':'ccw')+'">'+(isCW?'CW':'CCW')+'</div><div class="dir-hook">'+(dv.hook!=='none'?dv.hook:'-')+'</div>'+(dv.capSeal?'<div style="color:#f44;font-size:9px">CAPPED</div>':'')+'</div>'; }); 
+    bh += '</div></div><div class="eq-section"><h4>Charge Field Equations</h4>'; 
+    bh += '<div class="eq-row"><span>EQ-4 N-Emission</span><span class="eq-val">'+(el.charge.nEm*100).toFixed(1)+'%</span></div>'; 
+    bh += '<div class="eq-row"><span>EQ-5 S-Intake</span><span class="eq-val">'+(el.charge.sIn*100).toFixed(1)+'%</span></div>'; 
+    bh += '<div class="eq-row"><span>EQ-7 Eq-Net</span><span class="eq-val">'+(el.eqNet*100).toFixed(1)+'%</span></div>'; 
+    bh += '<div class="eq-row"><span>EQ-8 Recycled</span><span class="eq-val">'+(el.recyc*100).toFixed(1)+'%</span></div>'; 
+    bh += '<div class="eq-row"><span>EQ-9 Through</span><span class="eq-val">'+(el.thruCh*100).toFixed(1)+'%</span></div>'; 
+    bh += '<div class="eq-row"><span>EQ-10 R-eff</span><span class="eq-val">'+el.effR.toFixed(2)+'</span></div>'; 
+    bh += '<div class="eq-row"><span>EQ-11 omega</span><span class="eq-val">'+el.angV.toFixed(4)+'</span></div>'; 
+    bh += '<div class="eq-row" style="color:#ff0; font-weight:bold;"><span>Mathis IE1 Index</span><span class="eq-val" style="color:#ff0">'+MathisQ.calculateIE1(el.slots, el.dirs, null).toFixed(1)+'</span></div></div>'; 
+    bh += '<div style="margin-top:10px; font-size:10px; color:#555;">Calculation Reference: <a href="' + MathisQ.SOURCE_URL + '" target="_blank" style="color:#0af; text-decoration:underline;">Phase 2 Atomic Structure</a></div>';
+    document.getElementById('popup-body').innerHTML = bh; document.getElementById('popup-overlay').style.display = 'block'; document.getElementById('atom-popup').style.display = 'block'; 
+}
+function closeAtomPopup() { document.getElementById('popup-overlay').style.display = 'none'; document.getElementById('atom-popup').style.display = 'none'; }
+
+function buildPeriodicTable() { var g = document.getElementById('pt-grid'); for (var i = 1; i <= 98; i++) { if (!ELEMENTS[i]) continue; var b = document.createElement('button'); b.className = 'el-btn'; b.dataset.z = i; b.innerHTML = i + '<br>' + ELEMENTS[i].name; (function(z) { b.onclick = function() { buildAtom(z); }; })(i); g.appendChild(b); } }
+function updateSlotMap(z) { var el = ELEMENTS[z]; if (!el) return; var s = el.slots, m = document.getElementById('slot-map'); if (!m) return; m.innerHTML = ''; [{n:'Cap-N',v:slotCount(s.capN)},{n:'Pillar-N',v:slotCount(s.pn)},{n:'Car-E',v:slotCount(s.ce)},{n:'CORE',v:slotCount(s.core)},{n:'Center',v:slotCount(s.ctr)},{n:'Car-W',v:slotCount(s.cw)},{n:'Car-F',v:slotCount(s.cf)},{n:'Pillar-S',v:slotCount(s.ps)},{n:'Car-B',v:slotCount(s.cb)},{n:'Cap-S',v:slotCount(s.capS)}].forEach(function(x) { var d = document.createElement('div'); d.className = x.v > 0 ? 'filled' : ''; d.innerHTML = x.v > 0 ? x.n + '<br>' + x.v : (x.n || '-'); m.appendChild(d); }); }
+
+function updateInfoPanel(z) { 
+    var el = ELEMENTS[z]; if (!el) return; var s = el.slots, ch = el.charge, dr = el.dirs; 
+    var tp = slotCount(s.core)+slotCount(s.pn)+slotCount(s.ps)+slotCount(s.ce)+slotCount(s.cw)+slotCount(s.cf)+slotCount(s.cb)+slotCount(s.capN)+slotCount(s.capS)+slotCount(s.ctr); 
+    var ie1 = MathisQ.calculateIE1(s, dr, null);
+    var dd = '', arSym = {N:'&#9650;',S:'&#9660;',E:'&#8594;',W:'&#8592;',F:'&#8599;',B:'&#8601;'}; 
+    ['N','S','E','W','F','B'].forEach(function(dir) { var dv = dr[dir], emL = dv.em > 0.15 ? 'EMIT' : '-', il = dv.intake > 0.15 ? 'INTAKE' : '-'; var hk = dv.hook !== 'none' ? dv.hook : '-', sp = dv.spin === '+' ? '<span style="color:#ffdd00">&#8635;</span>' : '<span style="color:#00ddff">&#8634;</span>'; dd += arSym[dir]+' '+dir+': '+dv.size+'p '+sp+' hook:'+hk+' '+emL+'/'+il+(dv.capSeal ? ' <span style="color:#f44">[CAPPED]</span>' : '')+'<br>'; }); 
+    var infoEl = document.getElementById('info-content'); 
+    if (infoEl) { 
+        var detailsHtml = selectedElementDetailsVisible ? '<strong style="color:#0af;font-size:14px">'+el.name+' (Z='+z+')</strong> - '+tp+' protons | '+ATOMIC_CATS[z]+' | '+ATOMIC_FORMS[z].charAt(0).toUpperCase()+ATOMIC_FORMS[z].slice(1)+' | '+ATOMIC_WEIGHTS[z]+'u<br><strong>Slots:</strong> Core:'+slotCount(s.core)+' PN:'+slotCount(s.pn)+' PS:'+slotCount(s.ps)+' CE:'+slotCount(s.ce)+' CW:'+slotCount(s.cw)+' CF:'+slotCount(s.cf)+' CB:'+slotCount(s.cb)+' CapN:'+slotCount(s.capN)+' CapS:'+slotCount(s.capS)+' Ctr:'+slotCount(s.ctr)+'<br><strong>MQ Equations:</strong> EQ-4 N-Em: <span style="color:#0cf">'+(ch.nEm*100).toFixed(1)+'%</span> | EQ-5 S-In: <span style="color:#f80">'+(ch.sIn*100).toFixed(1)+'%</span> | EQ-9 Through: <span style="color:#88f">'+(el.thruCh*100).toFixed(1)+'%</span><br>EQ-7 Eq-Net: <span style="color:#0f8">'+(el.eqNet*100).toFixed(1)+'%</span> | EQ-8 Recyc: <span style="color:#fa0">'+(el.recyc*100).toFixed(1)+'%</span> | EQ-10 R: <span style="color:#0af">'+el.effR.toFixed(2)+'</span> | EQ-11 w: <span style="color:#f8f">'+el.angV.toFixed(4)+'</span><br><strong>Mathis IE1 Index:</strong> <span style="color:#ff0; font-weight:bold;">'+ie1.toFixed(1)+'</span> (Lower = easier to ionize)<br><strong>Directional MBN:</strong><br>'+dd : '<div class="detail-hidden-note">Element details are hidden. Use the button below to reveal the selected atom details.</div>'; 
+        
+        if (selectedElementDetailsVisible) {
+            detailsHtml += '<br><span style="color:#555; font-size:10px;">Calculation Reference: <a href="' + MathisQ.SOURCE_URL + '" target="_blank" style="color:#0af; text-decoration:underline;">Phase 2 Atomic Structure</a></span>';
+        }
+        
+        infoEl.innerHTML = '<button type="button" class="detail-toggle-btn" id="detail-toggle-btn">'+(selectedElementDetailsVisible ? 'Hide Details' : 'Show Details')+'</button><br>'+detailsHtml; 
+        var toggleBtn = document.getElementById('detail-toggle-btn'); 
+        if (toggleBtn) toggleBtn.onclick = function() { if (selectedElementDetailsVisible) { selectedElementDetailsVisible = false; closeAtomPopup(); } else { selectedElementDetailsVisible = true; showAtomPopup(z); } updateInfoPanel(z); }; 
+    } 
+}
+
+function runNMR() { 
+    var atoms = currentMolAtoms.length > 0 ? currentMolAtoms : (currentZ ? [{ id: 1, z: currentZ, position: new THREE.Vector3(0,0,0), occupiedDirs: new Set() }] : []); 
+    if (!atoms.length) { drawNMR([]); return; } 
+    var nmrPeaks = []; var bondRadius = 35; 
+    atoms.forEach(function(atom, i) { 
+        var el = ELEMENTS[atom.z]; if (!el) return; var isNMRActive = el.dirs.N.spin === '+'; if (!isNMRActive) return; 
+        var ppm = 0.5 + (el.thruCh * 5) + (el.charge.nEm * 10); var activeNeighbors = 0; 
+        atoms.forEach(function(other, j) { if (i === j) return; var dist = atom.position.distanceTo(other.position); if (dist < bondRadius) { var otherEl = ELEMENTS[other.z]; if (otherEl && otherEl.dirs.N.spin === '+') { activeNeighbors++; } } }); 
+        var mult = activeNeighbors + 1; var names = ['Singlet', 'Doublet', 'Triplet', 'Quartet', 'Quintet', 'Sextet', 'Septet', 'Octet']; 
+        nmrPeaks.push({ symbol: el.name, z: atom.z, ppm: Math.min(12, Math.max(0, ppm)), multiplicity: mult <= 8 ? names[mult-1] : (mult-1) + '-plet', activeNeighbors: activeNeighbors }); 
+    }); 
+    drawNMR(nmrPeaks); 
+}
+
+function drawNMR(peaks) { 
+    var canvas = document.getElementById('nmr-canvas'); if (!canvas) return; var ctx = canvas.getContext('2d'); var w = canvas.width, h = canvas.height; 
+    ctx.fillStyle = '#050510'; ctx.fillRect(0, 0, w, h); ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(40, 20); ctx.lineTo(40, h - 30); ctx.lineTo(w - 20, h - 30); ctx.stroke(); 
+    ctx.fillStyle = '#888'; ctx.font = '12px Arial'; ctx.textAlign = 'center'; 
+    for (var i = 0; i <= 12; i += 2) { var x = 40 + (i / 12) * (w - 60); ctx.fillText(i + '', x, h - 15); ctx.strokeStyle = '#222'; ctx.beginPath(); ctx.moveTo(x, 20); ctx.lineTo(x, h - 30); ctx.stroke(); } 
+    ctx.fillText('ppm (Deshielding ->)', w / 2, h - 2); ctx.save(); ctx.translate(15, h / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('Intensity', 0, 0); ctx.restore(); 
+    var peakTableHtml = ''; 
+    if (!peaks.length) { peakTableHtml = '<div style="color:#555; padding:5px;">No NMR active atoms (Requires N-Spin CW +)</div>'; } 
+    else { 
+        var colors = ['#ff44ff', '#44ffff', '#ffff44', '#44ff44', '#ff4444', '#4444ff']; 
+        peaks.forEach(function(p, idx) { 
+            var x = 40 + (p.ppm / 12) * (w - 60); var peakH = 80 - p.activeNeighbors * 10; var col = colors[idx % colors.length]; 
+            ctx.strokeStyle = col; ctx.lineWidth = 2; var spread = 4 + p.activeNeighbors * 4; 
+            for (var n = 0; n < p.activeNeighbors + 1; n++) { 
+                var px = x - (p.activeNeighbors * spread / 2) + (n * spread); var ph = peakH; ctx.beginPath(); ctx.moveTo(px, h - 30); ctx.lineTo(px - spread/3, h - 30 - ph); ctx.lineTo(px + spread/3, h - 30 - ph); ctx.closePath(); 
+                ctx.fillStyle = col; ctx.globalAlpha = 0.6; ctx.fill(); ctx.globalAlpha = 1.0; ctx.stroke(); 
+            } 
+            ctx.fillStyle = col; ctx.font = 'bold 12px Arial'; ctx.fillText(p.symbol, x, h - 40 - peakH); 
+            peakTableHtml += '<div style="color:'+col+'; margin-bottom:4px; border-left:3px solid '+col+'; padding-left:6px;">' + '<b>' + p.symbol + ' (Z=' + p.z + ')</b><br>' + 'Shift: ' + p.ppm.toFixed(2) + ' ppm | ' + 'Splitting: ' + p.multiplicity + ' (' + p.activeNeighbors + ' adjacent active)</div>'; 
+        }); 
+    } 
+    peakTableHtml += '<div style="color:#555; font-size:10px; margin-top:8px;">NMR Calculation Reference: <a href="' + MathisQ.SOURCE_URL + '" target="_blank" style="color:#0af; text-decoration:underline;">Phase 2 Atomic Structure</a></div>';
+    var peakDiv = document.getElementById('nmr-peaks'); if (peakDiv) peakDiv.innerHTML = peakTableHtml; 
+}
+
+function getCtrl(id) { var e = document.getElementById(id); if (!e) return 1; if (e.type === 'checkbox') return e.checked; if (e.type === 'range') return parseFloat(e.value); return e.value; }
+function animate() { 
+    requestAnimationFrame(animate); var dt = Math.min(clock.getDelta(), 0.05), sm = getCtrl('ctrl-speed'); orbitCtrl.update(); 
+    var sT = getCtrl('ctrl-through'), sI = getCtrl('ctrl-intake'), sE = getCtrl('ctrl-emission'), sEq = getCtrl('ctrl-equatorial'), sB = getCtrl('ctrl-bonds'), sL = getCtrl('ctrl-labels'), sD = getCtrl('ctrl-discs'), sCS = getCtrl('ctrl-carousel'), sP = getCtrl('ctrl-pressure'), sMT = getCtrl('ctrl-mbntags'), sSp = getCtrl('ctrl-spin'); 
+    allChargeStreams.forEach(function(s) { if (s.isChargeStream) { var st = s.streamType; if (st === 'through') s.visible = sT; else if (st === 'intake') s.visible = sI; else if (st === 'emission') s.visible = sE; else if (st === 'equatorial') s.visible = sEq; else s.visible = true; } else if (s.isBondStream) s.visible = sB; s.update(dt, sm); }); 
+    allLabels.forEach(function(l) { l.visible = sL; }); allArrows.forEach(function(a) { a.visible = sT || sI || sE || sEq; }); 
+    allPressureZones.forEach(function(p) { p.visible = sP; if (sP) { var t = clock.elapsedTime; p.material.opacity = p.userData.baseOpacity * (0.7 + 0.3 * Math.sin(t*2+p.position.x)); var sc = 1 + 0.1 * Math.sin(t*3+p.position.z); p.scale.set(sc, sc, sc); } }); 
+    allMBNTags.forEach(function(t) { t.visible = sMT; }); allSpinArrows.forEach(function(s) { s.visible = sSp; if (sSp && s.userData.spinMultiplier) s.rotation.y += dt * 2 * sm * s.userData.spinMultiplier; }); 
+    if (currentAtomGroup && sCS) currentAtomGroup.rotation.y += dt * 0.15 * sm; 
+    if (currentAtomGroup) { var t = clock.elapsedTime; currentAtomGroup.traverse(function(c) { if (c.userData && c.userData.isDisc) { c.material.opacity = CFG.Charge.maxOpacity * (0.5 + 0.5 * Math.sin(t*2+c.position.y)); c.visible = sD; } }); } 
+    if (electronGroup) { electronGroup.children.forEach(function(e) { var a = e.userData.angle + dt * e.userData.speed * sm; e.userData.angle = a; var r = e.userData.shellRadius, tilt = e.userData.tilt; e.position.set(r*Math.cos(a), r*Math.sin(a)*Math.sin(tilt), r*Math.sin(a)*Math.cos(tilt)); }); } 
+    renderer.render(scene, camera); 
+}
+
+function exportToCypher() {
+    if (!currentMolAtoms || currentMolAtoms.length === 0) {
+        alert("Please build a molecule first.");
+        return;
+    }
+    
+    var res = validateLayoutAtoms(currentMolAtoms);
+    var f = document.getElementById('mol-input').value.trim().replace(/[^A-Za-z0-9]/g, '');
+    
+    var cypher = "// Cypher script generated from Miles Mathis MBN Dynamics\n";
+    cypher += "// Molecule: " + f + "\n";
+    cypher += "// Clear existing graph (optional): MATCH (n) DETACH DELETE n;\n\n";
+    
+    // 1. Create Atom Nodes with Mathis properties (Including Formula and Element)
+    currentMolAtoms.forEach(function(a) {
+        var el = ELEMENTS[a.z];
+        var ie1 = MathisQ.calculateIE1(el.slots, el.dirs, a.occupiedDirs);
+        var coreSize = slotCount(el.slots.core);
+        
+        cypher += "CREATE (a" + a.id + ":Atom {";
+        cypher += "id:" + a.id + ", ";
+        cypher += "element:'" + el.name + "', ";
+        cypher += "formula:'" + f + "', "; // Added Formula property here
+        cypher += "z:" + a.z + ", ";
+        cypher += "coreSize:" + coreSize + ", ";
+        cypher += "ie1:" + ie1.toFixed(1);
+        cypher += "});\n";
+    });
+    cypher += "\n";
+
+    // 2. Create Directed Relationships (Bonds) with Mechanical MBN properties
+    res.bonds.forEach(function(b) {
+        var isThroughCharge = (b.dirA === 'N' && b.dirB === 'S') || (b.dirA === 'S' && b.dirB === 'N');
+        var bondType = isThroughCharge ? 'Through-Charge' : 'Carousel Interlock';
+        
+        cypher += "MATCH (a" + b.atomA.id + ":Atom), (a" + b.atomB.id + ":Atom) ";
+        cypher += "WHERE a" + b.atomA.id + ".id = " + b.atomA.id + " AND a" + b.atomB.id + ".id = " + b.atomB.id + " ";
+        cypher += "CREATE (a" + b.atomA.id + ")-[:BONDED_TO {";
+        cypher += "dirA:'" + b.dirA + "', ";
+        cypher += "dirB:'" + b.dirB + "', ";
+        cypher += "bondType:'" + bondType + "', ";
+        cypher += "spinA:'" + b.slotA.spin + "', ";
+        cypher += "spinB:'" + b.slotB.spin + "', ";
+        cypher += "hookA:'" + b.slotA.hook + "', ";
+        cypher += "hookB:'" + b.slotB.hook + "', ";
+        cypher += "strength:" + b.strength + ", ";
+        cypher += "status:'" + b.bondStatus + "'";
+        cypher += "}]->(a" + b.atomB.id + ");\n";
+    });
+
+    // Display the generated code in the UI
+    document.getElementById('cypher-text').value = cypher;
+    document.getElementById('cypher-output').style.display = 'block';
+}
+
+function copyCypher() {
+    var txt = document.getElementById('cypher-text');
+    txt.select();
+    txt.setSelectionRange(0, 99999); // For mobile devices
+    document.execCommand('copy');
+    alert('Cypher script copied to clipboard!');
+}
+
+
+window.onload = function() { init(); setupMoleculeSearch(); };
+</script>
+</body>
+</html>
